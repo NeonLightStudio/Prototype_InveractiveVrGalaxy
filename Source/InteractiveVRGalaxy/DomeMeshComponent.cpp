@@ -63,8 +63,9 @@ void UDomeMeshComponent::SetTransparent()
 	for (int i = 0; i < Super::GetNumSections(); i++)
 	{
 		UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(this->m_MaterialTransparent, this);
-		material->SetScalarParameterValue(FName("Duration"), FMath::RandRange(0.6f, 2.8f));
-		material->SetScalarParameterValue(FName("TimeOffset"), UGameplayStatics::GetRealTimeSeconds(this) + FMath::RandRange(0.0f, 1.0f));
+		material->SetScalarParameterValue(FName("BlendDuration"), FMath::RandRange(0.4f, 2.0f));
+		material->SetScalarParameterValue(FName("StartTime"), UGameplayStatics::GetRealTimeSeconds(this));
+		material->SetScalarParameterValue(FName("TimeOffset"), FMath::RandRange(0.0f, 0.8f));
 		//material->SetScalarParameterValue(FName("TimeOffset"), UGameplayStatics::GetRealTimeSeconds(this) + (i / (float)Super::GetNumSections()) * 2);//+ FMath::RandRange(0.0f, 2.0f));
 		Super::SetMaterial(i, material);
 	}
@@ -106,33 +107,33 @@ void UDomeMeshComponent::CreateDome()
 			temp.X = FMath::Cos(longitude + theta) * FMath::Sin(latitude + delta);
 			temp.Y = FMath::Cos(latitude + delta);
 			temp.Z = FMath::Sin(longitude + theta) * FMath::Sin(latitude + delta);
-			vertices.Add(temp); normals.Add(temp);
+			vertices.Add(temp); //normals.Add(temp);
 			uv.Add(FVector2D(0.0f, 1.0f));
 			//uv.Add(FVector2D(1.0f - (longitude + theta) / PI2 - 0.25f, (latitude + delta) / PI));
 
 			for (int i = 0; i < 4; i++)
 			{
-				//normals.Add(temp);
+				normals.Add(temp);
 			}
 
 			temp.X = FMath::Cos(longitude) * FMath::Sin(latitude + delta);
 			temp.Y = FMath::Cos(latitude + delta);
 			temp.Z = FMath::Sin(longitude) * FMath::Sin(latitude + delta);
-			vertices.Add(temp); normals.Add(temp);
+			vertices.Add(temp); //normals.Add(temp);
 			uv.Add(FVector2D(1.0f, 1.0f));
 			//uv.Add(FVector2D(1.0f - longitude / PI2 - 0.25f, (latitude + delta - PI / 180.0f) / PI));
 
 			temp.X = FMath::Cos(longitude) * FMath::Sin(latitude);
 			temp.Y = FMath::Cos(latitude);
 			temp.Z = FMath::Sin(longitude) * FMath::Sin(latitude);
-			vertices.Add(temp); normals.Add(temp);
+			vertices.Add(temp); //normals.Add(temp);
 			uv.Add(FVector2D(1.0f, 0.0f));
 			//uv.Add(FVector2D(1.0f - longitude / PI2 - 0.25f, latitude / PI));
 
 			temp.X = FMath::Cos(longitude + theta) * FMath::Sin(latitude);
 			temp.Y = FMath::Cos(latitude);
 			temp.Z = FMath::Sin(longitude + theta) * FMath::Sin(latitude);
-			vertices.Add(temp); normals.Add(temp);
+			vertices.Add(temp); //normals.Add(temp);
 			uv.Add(FVector2D(0.0f, 0.0f));
 			//uv.Add(FVector2D(1.0f - (longitude + theta) / PI2 - 0.25f, latitude / PI));
 
@@ -147,7 +148,7 @@ void UDomeMeshComponent::CreateDome()
 			//	normals.Add(normal);
 			//}
 
-			Super::CreateMeshSection(count++, vertices, indices, normals, uv, TArray<FColor>(), TArray<FProcMeshTangent>(), true);
+			Super::CreateMeshSection(count++, vertices, indices, normals, uv, TArray<FColor>(), TArray<FProcMeshTangent>(), false);
 		}
 	}
 	UE_LOG(LogClass, Log, TEXT("Section Counter: %d"), Super::GetNumSections());
