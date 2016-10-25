@@ -28,6 +28,8 @@ public:
 	// Called every frame
 	virtual void Tick(float delta) override;
 
+	//So can be called in blueprints 
+	UFUNCTION(BlueprintCallable, Category = "Dome")
 	void NextDomeState();
 
 	inline const EDomeState& GetDomeState() const { return this->m_DomeState; }
