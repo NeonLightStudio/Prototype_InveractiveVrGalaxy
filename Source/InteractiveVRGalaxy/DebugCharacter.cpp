@@ -53,6 +53,7 @@ void ADebugCharacter::SetupPlayerInputComponent(class UInputComponent* input)
 	input->BindAction("Action", EInputEvent::IE_Pressed, this, &ADebugCharacter::OnAction);
 }
 
+
 void ADebugCharacter::OnAction()
 {
 	check(this->m_Dome);

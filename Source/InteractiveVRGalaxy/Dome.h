@@ -28,6 +28,8 @@ public:
 	// Called every frame
 	virtual void Tick(float delta) override;
 
+	/** Activate Fancy New Project-Specific System Created in C++ ! */
+	UFUNCTION(BlueprintCallable, Category = "Dome")
 	void NextDomeState();
 
 	inline const EDomeState& GetDomeState() const { return this->m_DomeState; }
