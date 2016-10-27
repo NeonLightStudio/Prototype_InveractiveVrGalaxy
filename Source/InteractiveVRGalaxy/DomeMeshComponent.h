@@ -6,7 +6,7 @@
 #include "DomeMeshComponent.generated.h"
 
 /**
- * 
+ * UDomeMeshComponent represents the hemisphere mesh (- has no default material)
  */
 UCLASS()
 class INTERACTIVEVRGALAXY_API UDomeMeshComponent : public UProceduralMeshComponent
@@ -18,16 +18,13 @@ public:
 
 	void BeginPlay() override;
 
-	void SetOpaque();
+	//void SetOpaque();
 
-	void SetTransparent();
+	//void SetTransparent();
 
 	//void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent);
 	
 protected:
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials", meta = (DisplayName = "Material"))
-	//UMaterialInterface* m_Material;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dome", meta = (DisplayName = "Vertical Segments"))
 	int m_VerticalSegments;
 
@@ -37,11 +34,5 @@ protected:
 private:
 	UFUNCTION(BlueprintCallable, Category = "Dome")
 	void CreateDome();
-
-	UPROPERTY()
-	UMaterial *m_MaterialOpaque;
-
-	UPROPERTY()
-	UMaterial *m_MaterialTransparent;
 		
 };
