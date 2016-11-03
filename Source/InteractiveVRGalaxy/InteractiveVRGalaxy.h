@@ -7,3 +7,5 @@
 #define PI 3.14156265358979f
 #define PI2 (PI * 2.0f)
 
+#define DEG_TO_RAD (PI / 180.0f)
+#define RAD_TO_DEG (180.0f / PI)
