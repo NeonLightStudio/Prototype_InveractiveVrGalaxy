@@ -18,8 +18,8 @@ AStar::AStar()
 {
 	Super::SetMinVelocity(DEFAULT_MIN_SPEED);
 	Super::SetMaxVelocity(DEFAULT_MAX_SPEED);
-	Super::SetAphelion(DEFAULT_APHELION);
-	Super::SetPerihelion(DEFAULT_PERIHELION);
+	Super::SetFurthestDistance(DEFAULT_APHELION);
+	Super::SetNearestDistance(DEFAULT_PERIHELION);
 	Super::SetSemiMajorAxis(DEFAULT_SEMIMAJOR_AXIS);
 	Super::SetEccentricity(DEFAULT_ECCENTRICITY);
 	Super::SetGravity(DEFAULT_GRAVITY);

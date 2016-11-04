@@ -23,7 +23,7 @@ public:
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-	void SetScale(const float& size, const float& distance);
+	void SpawnBodies(AActor *parent, const TArray<TSubclassOf<ACelestialBody>>& bodies);
 	
 	// Called every frame
 	virtual void Tick(float delta) override;
@@ -49,7 +49,7 @@ private:
 
 	float m_CenterOffset;
 	ACelestialBody *m_CenterActor;
-	TArray<AActor*> m_AttachedActors;
+	TArray<AActor*> m_AttachedBodies;
 
 	bool bScaleUpdateRequired;
 };
