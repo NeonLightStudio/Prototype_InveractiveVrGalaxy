@@ -4,41 +4,114 @@
 
 #include "Dome.h"
 
-// Sets default values
-ADome::ADome() : m_DomeState(EDomeState::Opaque)
-{
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+#define ANIMATION_OPEN 1.0
+#define ANIMATION_CLOSE 0.0
 
+#define ANIMATION_DURATION 2.6f //this number must be constant
+#define ANIMATION_START_DELAY FMath::RandRange(0.2f, 0.8f)
+#define ANIMATION_COLOR_BLEND_DURATION FMath::RandRange(0.4f, 1.8f)
+#define ANIMATION_DISPLACE_DURATION 1.0f
+#define ANIMATION_DISPLACE_OFFSET 175.0f
+
+#define SCALAR_OPEN FName("Open")
+#define SCALAR_TIME FName("Time")
+#define SCALAR_ANIMATION_DURATION				FName("Animation Duration")
+#define SCALAR_ANIMATION_START_DELAY			FName("Animation Start Delay")
+#define SCALAR_ANIMATION_COLOR_BLEND_DURATION	FName("Color Blend Duration")
+#define SCALAR_ANIMATION_DISPLACE_DURATION		FName("Displace Duration")
+#define SCALAR_ANIMATION_DISPLACE_OFFSET		FName("Displace Offset")
+
+#define DOME_MATERIAL_LOCATION "Material'/Game/VirtualRealityBP/Materials/M_DomeMaterial.M_DomeMaterial'"
+
+// Sets default values
+ADome::ADome() : m_DomeState(EDomeState::Close), m_NextDomeState(EDomeState::Undefined), m_DomeStateTime(0.0f), m_MaterialInstance(nullptr)
+{
+	// Set the mesh of this component to the Dome Mesh
 	this->m_Mesh = UObject::CreateDefaultSubobject<UDomeMeshComponent>(TEXT("DomeMesh"));
 	Super::RootComponent = this->m_Mesh;
+
+	// Find our Dome Material
+	static ConstructorHelpers::FObjectFinder<UMaterial> material(TEXT(DOME_MATERIAL_LOCATION));
+	check(material.Succeeded());
+	this->m_Material = material.Object;
+	
+	// Let the dome tick so that we can control the animation
+	Super::PrimaryActorTick.bCanEverTick = true;
+}
+
+ADome::~ADome()
+{
+	if (this->m_MaterialInstance != nullptr)
+	{
+		delete[] this->m_MaterialInstance;
+		this->m_MaterialInstance = nullptr;
+	}
 }
 
 // Called when the game starts or when spawned
 void ADome::BeginPlay()
 {
 	Super::BeginPlay();
+
+	check(this->m_Mesh);
+	if (this->m_Mesh->GetNumSections() == 0)
+	{
+		return;
+	}
+	check(this->m_Material);
+
+	if (this->m_MaterialInstance != nullptr)
+	{
+		delete[] this->m_MaterialInstance;
+	}
+	this->m_MaterialInstance = new UMaterialInstanceDynamic*[this->m_Mesh->GetNumSections()];
+
+	// Since this is the inital setup we will subtract the animation duration so that the animation does not play on initialization
+	this->m_DomeStateTime = UGameplayStatics::GetRealTimeSeconds(this) - ANIMATION_DURATION;
+	for (int i = 0; i < this->m_Mesh->GetNumSections(); i++)
+	{
+		UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(this->m_Material, this);
+
+		material->SetScalarParameterValue(SCALAR_OPEN, ANIMATION_CLOSE);
+		material->SetScalarParameterValue(SCALAR_ANIMATION_DURATION, ANIMATION_DURATION);
+		material->SetScalarParameterValue(SCALAR_ANIMATION_START_DELAY, ANIMATION_START_DELAY);
+		material->SetScalarParameterValue(SCALAR_ANIMATION_COLOR_BLEND_DURATION, ANIMATION_COLOR_BLEND_DURATION);
+		material->SetScalarParameterValue(SCALAR_ANIMATION_DISPLACE_DURATION, ANIMATION_DISPLACE_DURATION);
+		material->SetScalarParameterValue(SCALAR_ANIMATION_DISPLACE_OFFSET, ANIMATION_DISPLACE_OFFSET);
+
+		// Set the time which our animation started to a time where it should already be finished
+		material->SetScalarParameterValue(SCALAR_TIME, this->m_DomeStateTime); 
+
+		this->m_Mesh->SetMaterial(i, material);
+		this->m_MaterialInstance[i] = material;
+	}
 }
 
 // Called every frame
 void ADome::Tick(float delta)
 {
 	Super::Tick(delta);
-}
 
-void ADome::NextDomeState()
-{
-	switch (this->m_DomeState)
+	if (this->m_NextDomeState != this->m_DomeState
+		&& this->m_NextDomeState != EDomeState::Undefined)
 	{
-		case EDomeState::Opaque:
-			this->m_DomeState = EDomeState::Transparent;
-			this->m_Mesh->SetTransparent();
-			break;
+		float time = UGameplayStatics::GetRealTimeSeconds(this);
+		float timeOffset = (this->m_DomeStateTime + ANIMATION_DURATION) - time;
 
-		case EDomeState::Transparent:
-			this->m_DomeState = EDomeState::Opaque;
-			this->m_Mesh->SetOpaque();
-			break;
+		if (timeOffset > 0.0f && timeOffset < ANIMATION_DURATION)
+		{
+			time -= timeOffset;
+		}
+		check(this->m_MaterialInstance);
+		for (int i = 0; i < this->m_Mesh->GetNumSections(); i++)
+		{
+			UMaterialInstanceDynamic *material = this->m_MaterialInstance[i];
+			check(material);
+			material->SetScalarParameterValue(SCALAR_OPEN, this->m_NextDomeState == EDomeState::Open ? ANIMATION_OPEN : ANIMATION_CLOSE);
+			material->SetScalarParameterValue(SCALAR_TIME, time);
+		}
+		this->m_DomeStateTime = time;
+		this->m_DomeState = this->m_NextDomeState;
+		this->m_NextDomeState = EDomeState::Undefined;
 	}
 }
-
