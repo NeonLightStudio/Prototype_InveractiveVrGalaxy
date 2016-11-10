@@ -29,7 +29,7 @@ public:
 #endif
 
 	// Set the scale of the body
-	void SetScale(const float& size);
+	void SetScale(const float& size) const;
 
 	float CalculateRotation(const float& radians) const;
 
@@ -40,6 +40,10 @@ public:
 	float CalculateDistance(const float& radians) const;
 
 	FVector CalculatePosition(const float& radians, const float& offset, const float& distanceScale) const;
+
+	void ResetDrawOrbit();
+
+	void SetDrawOrbit(const bool& draw);
 
 	void Move(const ACelestialBody *center, const float& multiplier, const float& distanceScale);
 
@@ -69,6 +73,23 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Satellites", meta = (AllowPrivateAccess = "true", DisplayName = "Satellites"))
 	TArray<TSubclassOf<ACelestialBody>> m_Satellites;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Orbit"))
+	bool m_bDrawOrbit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Resolution"))
+	int m_OrbitParticleResolution;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Color"))
+	FLinearColor m_OrbitColor;
+
+	UPROPERTY()
+	UParticleSystem *m_ParticleSystem;
+
+	UPROPERTY()
+	TArray<UParticleSystemComponent*> m_OrbitParticleSystems;
+
+	float m_LastOffset, m_LastDistanceScale;
 
 private:
 	// Minimum orbit speed (Speed at Aphelion)
