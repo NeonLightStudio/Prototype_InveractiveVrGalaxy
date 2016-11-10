@@ -55,18 +55,8 @@ void ADebugCharacter::SetupPlayerInputComponent(class UInputComponent* input)
 
 void ADebugCharacter::OnAction()
 {
-	if (this->m_Dome == nullptr)
-	{
-		return;
-	}
-	if (this->m_Dome->GetDomeState() == EDomeState::Open)
-	{
-		this->m_Dome->SetDomeState(EDomeState::Close);
-	}
-	else
-	{
-		this->m_Dome->SetDomeState(EDomeState::Open);
-	}
+	check(this->m_Dome);
+	this->m_Dome->NextDomeState();
 }
 
 void ADebugCharacter::MoveForward(float value)
