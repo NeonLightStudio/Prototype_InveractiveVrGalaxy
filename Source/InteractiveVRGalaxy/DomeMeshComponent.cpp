@@ -29,7 +29,7 @@ UDomeMeshComponent::UDomeMeshComponent()
 	//this->m_Material = s_Material.Object;
 	// set the material if it is defined
 	//Super::SetMaterial(0, this->m_Material);
-	
+
 	//this->CreateDome(); // Can't create mesh here. It must be done after the initialization of the instance (BeginPlay)
 }
 
@@ -75,13 +75,13 @@ void UDomeMeshComponent::SetTransparent()
 #if WITH_EDITOR
 void UDomeMeshComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	FName name = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+FName name = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
 
-	if (name == GET_MEMBER_NAME_CHECKED(UDomeMeshComponent, m_VerticalSegments)
-		|| name == GET_MEMBER_NAME_CHECKED(UDomeMeshComponent, m_HorizontalSegments))
-	{
-		this->CreateDome();
-	}
+if (name == GET_MEMBER_NAME_CHECKED(UDomeMeshComponent, m_VerticalSegments)
+|| name == GET_MEMBER_NAME_CHECKED(UDomeMeshComponent, m_HorizontalSegments))
+{
+this->CreateDome();
+}
 }
 #endif
 */
@@ -90,7 +90,7 @@ void UDomeMeshComponent::CreateDome()
 {
 	Super::ClearAllMeshSections();
 
-	
+
 
 	int32 count = 0;
 	FVector temp;

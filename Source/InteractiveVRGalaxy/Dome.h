@@ -30,7 +30,7 @@ public:
 
 	//So can be called in blueprints 
 	UFUNCTION(BlueprintCallable, Category = "Dome")
-	void NextDomeState();
+		void NextDomeState();
 
 	inline const EDomeState& GetDomeState() const { return this->m_DomeState; }
 
@@ -40,3 +40,5 @@ private:
 
 	EDomeState m_DomeState;
 };
+
+

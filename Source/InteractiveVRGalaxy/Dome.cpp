@@ -30,15 +30,15 @@ void ADome::NextDomeState()
 {
 	switch (this->m_DomeState)
 	{
-		case EDomeState::Opaque:
-			this->m_DomeState = EDomeState::Transparent;
-			this->m_Mesh->SetTransparent();
-			break;
+	case EDomeState::Opaque:
+		this->m_DomeState = EDomeState::Transparent;
+		this->m_Mesh->SetTransparent();
+		break;
 
-		case EDomeState::Transparent:
-			this->m_DomeState = EDomeState::Opaque;
-			this->m_Mesh->SetOpaque();
-			break;
+	case EDomeState::Transparent:
+		this->m_DomeState = EDomeState::Opaque;
+		this->m_Mesh->SetOpaque();
+		break;
 	}
 }
 
