@@ -30,15 +30,6 @@ void ASolarSystem::BeginPlay()
 		this->m_AttachedBodies.Add(this->m_CenterActor);
 	}
 	this->bScaleUpdateRequired = true;
-
-	//for (float i = 0; i < PI2; i += PI2 / 20)
-	//{
-	//	float x = FMath::Cos(i), y = FMath::Sin(i);
-	//	float r = ((ACelestialBody*)m_AttachedActors[1])->CalculateDistance(i);
-	//	UE_LOG(LogClass, Log, TEXT("%f %f"), r, ((ACelestialBody*)m_AttachedActors[1])->CalculateVelocity(i));
-	//	//DrawDebugSphere(Super::GetWorld(), FVector(x * r * this->m_DistanceScale, y * r * this->m_DistanceScale, 0.0f), 50, 20, FColor::Red, true);
-	//}
-
 }
 
 void ASolarSystem::SpawnBodies(AActor *parent, const TArray<TSubclassOf<ACelestialBody>>& bodies)

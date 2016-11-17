@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Atmosphere.h"
 #include "CelestialBody.generated.h"
 
 #define DAYS
@@ -29,7 +30,7 @@ public:
 #endif
 
 	// Set the scale of the body
-	void SetScale(const float& size) const;
+	void SetScale(const float& size);
 
 	float CalculateRotation(const float& radians) const;
 
@@ -45,15 +46,21 @@ public:
 
 	void SetDrawOrbit(const bool& draw);
 
+	void SetDrawAtmosphere(const bool& enable);
+
 	void Move(const ACelestialBody *center, const float& multiplier, const float& distanceScale);
 
-	FORCEINLINE USceneComponent* GetRootComponent() { return this->m_Root; }
+	FORCEINLINE USceneComponent* GetRootComponent() const { return this->m_Root; }
 
 	FORCEINLINE const TArray<TSubclassOf<ACelestialBody>>& GetSatellites() const { return this->m_Satellites; }
 
 	FORCEINLINE const float& GetAngleToCenter() const { return this->m_Angle; }
 
 	FORCEINLINE const float& GetRadiusWithScale() const { return this->m_Root->Bounds.SphereRadius; }
+
+	FORCEINLINE const float& GetSizeScale() const { return this->m_LastSizeScale; }
+
+	FORCEINLINE const float& GetDistanceScale() const { return this->m_LastDistanceScale; }
 
 private:
 	FORCEINLINE void CalculateSemiMinorAxis() { this->m_SemiMinorAxis = this->m_SemiMajorAxis * FMath::Sqrt(1.0f - this->m_Eccentricity * this->m_Eccentricity); }
@@ -74,24 +81,42 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Satellites", meta = (AllowPrivateAccess = "true", DisplayName = "Satellites"))
 	TArray<TSubclassOf<ACelestialBody>> m_Satellites;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Orbit"))
-	bool m_bDrawOrbit;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Resolution"))
-	int m_OrbitParticleResolution;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Color"))
-	FLinearColor m_OrbitColor;
-
+	// Beam particle used for orbit render
 	UPROPERTY()
 	UParticleSystem *m_ParticleSystem;
 
+	// All of the active particle systems (only has content when the orbit is being rendered)
 	UPROPERTY()
 	TArray<UParticleSystemComponent*> m_OrbitParticleSystems;
 
-	float m_LastOffset, m_LastDistanceScale;
+	// Parameters stored within the solar system are cached here. May not be latest value and can be changed without notice.
+	float m_LastOffset, m_LastSizeScale, m_LastDistanceScale;
 
 private:
+	// Whether or not to have an atmosphere
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Atmosphere", meta = (AllowPrivateAccess = "true", DisplayName = "Enable Atmosphere"))
+	bool m_bDrawAtmosphere;
+
+	// Atmosphere data
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Atmosphere", meta = (AllowPrivateAccess = "true", DisplayName = "Data"))
+	FAtmosphereData m_AtmosphereData;
+
+	// Atmosphere actor
+	UPROPERTY()
+	AAtmosphere *m_Atmosphere;
+
+	// Whether or not to draw the orbit
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Orbit"))
+	bool m_bDrawOrbit;
+
+	// How many samples to take for the orbit render
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Resolution"))
+	int m_OrbitParticleResolution;
+
+	// Color of the orbit
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Color"))
+	FLinearColor m_OrbitColor;
+
 	// Minimum orbit speed (Speed at Aphelion)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orbit", meta = (AllowPrivateAccess = "true", DisplayName = "Min Speed (km/s)"))
 	float m_MinSpeed;
@@ -169,6 +194,10 @@ private:
 	bool m_RotatePlanetClockwise;
 
 public:
+	FORCEINLINE AAtmosphere* GetAtmosphere() { return this->m_Atmosphere; }
+
+	FORCEINLINE FAtmosphereData& GetAtmosphereData() { return this->m_AtmosphereData; }
+
 	FORCEINLINE const float& GetFurthestDistance() const { return this->m_FurthestDistance; }
 
 	FORCEINLINE const float& GetNearestDistance() const { return this->m_NearestDistance; }

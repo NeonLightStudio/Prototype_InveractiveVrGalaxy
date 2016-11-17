@@ -9,8 +9,8 @@
 #define SPHERE_MESH_LOCATION TEXT("StaticMesh'/Game/VirtualRealityBP/Blueprints/Planets/SphereMesh.SphereMesh'")
 
 // Sets default values
-ACelestialBody::ACelestialBody() : m_Material(nullptr), m_bDrawOrbit(false), m_OrbitParticleResolution(20), m_OrbitColor(FLinearColor::White),
-		m_ParticleSystem(nullptr), m_CurrentSpeed(0.0f), m_Angle(0.0f), m_RotateOrbitClockwise(true)
+ACelestialBody::ACelestialBody() : m_Material(nullptr), m_ParticleSystem(nullptr), m_bDrawAtmosphere(false), m_Atmosphere(nullptr),
+		m_bDrawOrbit(false), m_OrbitParticleResolution(20), m_OrbitColor(FLinearColor::White), m_CurrentSpeed(0.0f), m_Angle(0.0f), m_RotateOrbitClockwise(true)
 {
 	this->m_Root = UObject::CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyRoot"));
 	Super::RootComponent = this->m_Root;
@@ -33,6 +33,16 @@ void ACelestialBody::BeginPlay()
 	this->CalculateSemiMinorAxis();
 	this->CalculatePerimeter();
 
+	if(this->m_bDrawOrbit)
+	{
+		this->m_bDrawOrbit = false;
+		this->SetDrawOrbit(true);
+	}
+	if(this->m_bDrawAtmosphere)
+	{
+		this->m_bDrawAtmosphere = false;
+		this->SetDrawAtmosphere(true);
+	}
 	if (this->m_Material)
 	{
 		this->m_Root->SetMaterial(0, this->m_Material);
@@ -70,15 +80,25 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 	{
 		this->ResetDrawOrbit();
 	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_bDrawAtmosphere))
+	{
+		this->m_bDrawAtmosphere = !this->m_bDrawAtmosphere;
+		this->SetDrawAtmosphere(!this->m_bDrawAtmosphere);
+	}
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
 
-void ACelestialBody::SetScale(const float& scale) const
+void ACelestialBody::SetScale(const float& scale)
 {
 	check(this->m_Root);
 	float newScale = this->m_Radius * scale;
 	this->m_Root->SetWorldScale3D(FVector(newScale));
+	this->m_LastSizeScale = scale;
+	if(this->m_Atmosphere != nullptr)
+	{
+		this->m_Atmosphere->UpdateAtmosphere();
+	}
 }
 
 float ACelestialBody::CalculateRotation(const float& radians) const
@@ -103,6 +123,7 @@ FVector ACelestialBody::CalculatePosition(const float& radians, const float& off
 	FVector vector;
 	vector.X = (offset + this->m_SemiMajorAxis * distanceScale) * -FMath::Cos(radians);
 	vector.Y = (offset + this->m_SemiMinorAxis * distanceScale) * FMath::Sin(radians);
+	vector.Z = 0.0f;
 	if (!this->m_RotateOrbitClockwise)
 	{
 		vector.Y = -vector.Y;
@@ -120,13 +141,49 @@ void ACelestialBody::ResetDrawOrbit()
 	this->SetDrawOrbit(true);
 }
 
+void ACelestialBody::SetDrawAtmosphere(const bool& draw)
+{
+	if(this->m_bDrawAtmosphere == draw)
+	{
+		return;
+	}
+	this->m_bDrawAtmosphere = draw;
+	if(Super::GetWorld() == nullptr)
+	{
+		return;
+	}
+	if(!draw)
+	{
+		if(this->m_Atmosphere != nullptr)
+		{
+			this->m_Atmosphere->Destroy();
+			this->m_Atmosphere = nullptr;
+		}
+	}
+	else
+	{
+		this->m_Atmosphere = (AAtmosphere*)Super::GetWorld()->SpawnActor(AAtmosphere::StaticClass());
+		if(this->m_Atmosphere)
+		{
+			this->m_Atmosphere->SetAtmosphereData(&this->m_AtmosphereData);
+			this->m_Atmosphere->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+			this->m_Atmosphere->UpdateAtmosphere();
+		}
+	}
+}
+
 void ACelestialBody::SetDrawOrbit(const bool& draw)
 {
-	if(this->m_bDrawOrbit == draw || (draw && this->m_ParticleSystem == nullptr))
+	if(Super::GetWorld() == nullptr || this->m_bDrawOrbit == draw || (draw && this->m_ParticleSystem == nullptr))
 	{
 		return;
 	}
 	this->m_bDrawOrbit = draw;
+	if (Super::GetWorld() == nullptr)
+	{
+		return;
+	}
 	if(!draw)
 	{
 		for(int i = 0; i < this->m_OrbitParticleSystems.Num(); i++)
@@ -135,7 +192,7 @@ void ACelestialBody::SetDrawOrbit(const bool& draw)
 		}
 		this->m_OrbitParticleSystems.Empty();
 	}
-	else
+	else 
 	{
 		check(this->m_OrbitParticleResolution >= 0);
 
