@@ -30,7 +30,7 @@ public:
 #endif
 
 	// Set the scale of the body
-	void SetScale(const float& size);
+	void SetScale(const float& size) const;
 
 	float CalculateRotation(const float& radians) const;
 

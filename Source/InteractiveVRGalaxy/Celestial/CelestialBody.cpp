@@ -89,7 +89,7 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 }
 #endif
 
-void ACelestialBody::SetScale(const float& scale)
+void ACelestialBody::SetScale(const float& scale) const
 {
 	check(this->m_Root);
 	float newScale = this->m_Radius * scale;
@@ -175,7 +175,7 @@ void ACelestialBody::SetDrawAtmosphere(const bool& draw)
 
 void ACelestialBody::SetDrawOrbit(const bool& draw)
 {
-	if(Super::GetWorld() == nullptr || this->m_bDrawOrbit == draw || (draw && this->m_ParticleSystem == nullptr))
+	if(this->m_bDrawOrbit == draw || (draw && this->m_ParticleSystem == nullptr))
 	{
 		return;
 	}
@@ -192,7 +192,7 @@ void ACelestialBody::SetDrawOrbit(const bool& draw)
 		}
 		this->m_OrbitParticleSystems.Empty();
 	}
-	else 
+	else
 	{
 		check(this->m_OrbitParticleResolution >= 0);
 
