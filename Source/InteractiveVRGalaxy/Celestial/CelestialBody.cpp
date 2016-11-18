@@ -89,7 +89,7 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 }
 #endif
 
-void ACelestialBody::SetScale(const float& scale) const
+void ACelestialBody::SetScale(const float& scale)
 {
 	check(this->m_Root);
 	float newScale = this->m_Radius * scale;
