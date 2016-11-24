@@ -36,14 +36,14 @@ private:
 	// Dome reference. This field is set within the blueprint.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Dome", meta = (AllowPrivateAccess = "true", DisplayName = "Dome Actor"))
 	class ADome *m_Dome;
-
+	
 public:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (DisplayName = "Base Turn Rate"))
-		float m_BaseTurnRate;
+	float m_BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (DisplayName = "Base Look Up Rate"))
-		float m_BaseLookUpRate;
+	float m_BaseLookUpRate;
 
 };

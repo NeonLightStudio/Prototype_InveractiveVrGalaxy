@@ -9,14 +9,9 @@
 #define SPHERE_MESH_LOCATION TEXT("StaticMesh'/Game/VirtualRealityBP/Blueprints/Planets/SphereMesh.SphereMesh'")
 
 // Sets default values
-<<<<<<< HEAD
-ACelestialBody::ACelestialBody() : m_Material(nullptr), m_ParticleSystem(nullptr), m_bDrawAtmosphere(false), m_Atmosphere(nullptr),
-		m_bDrawOrbit(false), m_OrbitParticleResolution(20), m_OrbitColor(FLinearColor::White), m_CurrentSpeed(0.0f), m_Angle(0.0f), m_RotateOrbitClockwise(true)
-=======
 ACelestialBody::ACelestialBody() : m_Material(nullptr), m_ParticleSystem(nullptr), m_bDrawAtmosphere(false), 
 	m_Atmosphere(nullptr), m_bDrawOrbit(false), m_OrbitParticleResolution(20), m_OrbitColor(FLinearColor::White), m_CurrentSpeed(0.0f), 
 	m_Angle(0.0f), m_RotateOrbitClockwise(true), m_VelocityScale(1.0f), m_RotationScale(1.0f), m_RadiusScale(1.0f), m_OrbitDistanceScale(1.0f)
->>>>>>> refs/remotes/origin/orbit
 {
 	this->m_Root = UObject::CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyRoot"));
 	Super::RootComponent = this->m_Root;
@@ -91,13 +86,10 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 		this->m_bDrawAtmosphere = !this->m_bDrawAtmosphere;
 		this->SetDrawAtmosphere(!this->m_bDrawAtmosphere);
 	}
-<<<<<<< HEAD
-=======
 	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_RadiusScale))
 	{
 		this->SetRadiusScale(this->m_RadiusScale);
 	}
->>>>>>> refs/remotes/origin/orbit
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
@@ -107,11 +99,7 @@ void ACelestialBody::SetScale(const float& scale)
 	check(this->m_Root);
 	float newScale = this->m_Radius * scale * this->m_RadiusScale;
 	this->m_Root->SetWorldScale3D(FVector(newScale));
-<<<<<<< HEAD
-	this->m_LastSizeScale = scale;
-=======
 	this->m_LastRadiusScale = scale;
->>>>>>> refs/remotes/origin/orbit
 	if(this->m_Atmosphere != nullptr)
 	{
 		this->m_Atmosphere->UpdateAtmosphere();
@@ -138,13 +126,8 @@ float ACelestialBody::CalculateDistance(const float& radians) const
 FVector ACelestialBody::CalculatePosition(const float& radians, const float& offset, const float& distanceScale) const
 {
 	FVector vector;
-<<<<<<< HEAD
-	vector.X = (offset + this->m_SemiMajorAxis * distanceScale) * -FMath::Cos(radians);
-	vector.Y = (offset + this->m_SemiMinorAxis * distanceScale) * FMath::Sin(radians);
-=======
 	vector.X = (offset + this->m_SemiMajorAxis * distanceScale * this->m_OrbitDistanceScale) * -FMath::Cos(radians);
 	vector.Y = (offset + this->m_SemiMinorAxis * distanceScale * this->m_OrbitDistanceScale) * FMath::Sin(radians);
->>>>>>> refs/remotes/origin/orbit
 	vector.Z = 0.0f;
 	if (!this->m_RotateOrbitClockwise)
 	{

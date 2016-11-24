@@ -50,15 +50,10 @@ public:
 	// Whether or not to draw the orbit of this body
 	void SetDrawOrbit(const bool& draw);
 
-<<<<<<< HEAD
-	void SetDrawAtmosphere(const bool& enable);
-
-=======
 	// Whether or not the draw the atmosphere of this body
 	void SetDrawAtmosphere(const bool& enable);
 
 	// Move this body along its orbit. Requires the center, speed multiplier, and orbit distance scale
->>>>>>> refs/remotes/origin/orbit
 	void Move(const ACelestialBody *center, const float& multiplier, const float& distanceScale);
 
 	FORCEINLINE USceneComponent* GetRootComponent() const { return this->m_Root; }
@@ -69,15 +64,9 @@ public:
 
 	FORCEINLINE const float& GetRadiusWithScale() const { return this->m_Root->Bounds.SphereRadius; }
 
-<<<<<<< HEAD
-	FORCEINLINE const float& GetSizeScale() const { return this->m_LastSizeScale; }
-
-	FORCEINLINE const float& GetDistanceScale() const { return this->m_LastDistanceScale; }
-=======
 	FORCEINLINE const float& GetSolarSystemRadiusScale() const { return this->m_LastRadiusScale; }
 
 	FORCEINLINE const float& GetSolarSystemDistanceScale() const { return this->m_LastDistanceScale; }
->>>>>>> refs/remotes/origin/orbit
 
 private:
 	FORCEINLINE void CalculateSemiMinorAxis() { this->m_SemiMinorAxis = this->m_SemiMajorAxis * FMath::Sqrt(1.0f - this->m_Eccentricity * this->m_Eccentricity); }
@@ -107,11 +96,7 @@ private:
 	TArray<UParticleSystemComponent*> m_OrbitParticleSystems;
 
 	// Parameters stored within the solar system are cached here. May not be latest value and can be changed without notice.
-<<<<<<< HEAD
-	float m_LastOffset, m_LastSizeScale, m_LastDistanceScale;
-=======
 	float m_LastOffset, m_LastRadiusScale, m_LastDistanceScale;
->>>>>>> refs/remotes/origin/orbit
 
 private:
 	// Whether or not to have an atmosphere
@@ -127,11 +112,7 @@ private:
 	AAtmosphere *m_Atmosphere;
 
 	// Whether or not to draw the orbit
-<<<<<<< HEAD
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Orbit"))
-=======
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Orbit"))
->>>>>>> refs/remotes/origin/orbit
 	bool m_bDrawOrbit;
 
 	// How many samples to take for the orbit render
@@ -235,13 +216,6 @@ private:
 	bool m_RotatePlanetClockwise;
 
 public:
-<<<<<<< HEAD
-	FORCEINLINE AAtmosphere* GetAtmosphere() { return this->m_Atmosphere; }
-
-	FORCEINLINE FAtmosphereData& GetAtmosphereData() { return this->m_AtmosphereData; }
-
-	FORCEINLINE const float& GetFurthestDistance() const { return this->m_FurthestDistance; }
-=======
 	UFUNCTION(BlueprintPure, Category = "Atmosphere")
 	AAtmosphere* GetAtmosphere() const { return this->m_Atmosphere; }
 
@@ -274,7 +248,6 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Characteristics")
 	const float& GetMass() const { return this->m_Mass; }
->>>>>>> refs/remotes/origin/orbit
 
 	UFUNCTION(BlueprintPure, Category = "Characteristics")
 	const float& GetRadius() const { return this->m_Radius; }

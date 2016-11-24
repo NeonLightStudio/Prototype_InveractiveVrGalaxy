@@ -6,11 +6,12 @@
 #include "DomeMeshComponent.h"
 #include "Dome.generated.h"
 
-UENUM()
-enum class EDomeState : uint8
+//UENUM()
+enum EDomeState : uint8
 {
-	Opaque = 0,
-	Transparent = 1
+	Undefined = 0,	// The dome has no state
+	Open = 1,		// The dome is completely transparent
+	Close = 2		// The dome is completely opaque
 };
 
 UCLASS()
@@ -21,6 +22,7 @@ class INTERACTIVEVRGALAXY_API ADome : public AActor
 public:
 	// Sets default values for this actor's properties
 	ADome();
+	~ADome();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,17 +30,22 @@ public:
 	// Called every frame
 	virtual void Tick(float delta) override;
 
-	//So can be called in blueprints 
-	UFUNCTION(BlueprintCallable, Category = "Dome")
-		void NextDomeState();
+	// Set the state of the dome. It will be set within the next game tick.
+	FORCEINLINE void SetDomeState(const EDomeState& state) { this->m_NextDomeState = state; }
 
-	inline const EDomeState& GetDomeState() const { return this->m_DomeState; }
+	// Get the current state of the dome. The state returned is (potentially) from the previous tick and not the current.
+	FORCEINLINE const EDomeState& GetDomeState() const { return this->m_DomeState; }
 
 private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
+	UMaterial *m_Material;
+	UMaterialInstanceDynamic **m_MaterialInstance;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	class UDomeMeshComponent *m_Mesh;
 
-	EDomeState m_DomeState;
+	float m_DomeStateTime;
+	//bool m_DomeStateComplete;
+
+	EDomeState m_DomeState, m_NextDomeState;
 };
-
-
