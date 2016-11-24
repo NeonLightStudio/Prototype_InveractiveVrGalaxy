@@ -32,6 +32,7 @@ public:
 	// Set the scale of the body
 	void SetScale(const float& size);
 
+	// Calculate the rotation of the body at the given orbit angle (radians)
 	float CalculateRotation(const float& radians) const;
 
 	// Calculate the velocity of the body using the current angle (radians)
@@ -40,14 +41,24 @@ public:
 	// Calculate the distance from the center at the given angle (radians)
 	float CalculateDistance(const float& radians) const;
 
+	// Calculate the position of the body using the orbit angle, distance offset, and distance scale
 	FVector CalculatePosition(const float& radians, const float& offset, const float& distanceScale) const;
 
+	// Update the orbit. Must be called whenever the orbit parameters are changed. (Otherwise no changes will happen)
 	void ResetDrawOrbit();
 
+	// Whether or not to draw the orbit of this body
 	void SetDrawOrbit(const bool& draw);
 
+<<<<<<< HEAD
 	void SetDrawAtmosphere(const bool& enable);
 
+=======
+	// Whether or not the draw the atmosphere of this body
+	void SetDrawAtmosphere(const bool& enable);
+
+	// Move this body along its orbit. Requires the center, speed multiplier, and orbit distance scale
+>>>>>>> refs/remotes/origin/orbit
 	void Move(const ACelestialBody *center, const float& multiplier, const float& distanceScale);
 
 	FORCEINLINE USceneComponent* GetRootComponent() const { return this->m_Root; }
@@ -58,9 +69,15 @@ public:
 
 	FORCEINLINE const float& GetRadiusWithScale() const { return this->m_Root->Bounds.SphereRadius; }
 
+<<<<<<< HEAD
 	FORCEINLINE const float& GetSizeScale() const { return this->m_LastSizeScale; }
 
 	FORCEINLINE const float& GetDistanceScale() const { return this->m_LastDistanceScale; }
+=======
+	FORCEINLINE const float& GetSolarSystemRadiusScale() const { return this->m_LastRadiusScale; }
+
+	FORCEINLINE const float& GetSolarSystemDistanceScale() const { return this->m_LastDistanceScale; }
+>>>>>>> refs/remotes/origin/orbit
 
 private:
 	FORCEINLINE void CalculateSemiMinorAxis() { this->m_SemiMinorAxis = this->m_SemiMajorAxis * FMath::Sqrt(1.0f - this->m_Eccentricity * this->m_Eccentricity); }
@@ -90,7 +107,11 @@ private:
 	TArray<UParticleSystemComponent*> m_OrbitParticleSystems;
 
 	// Parameters stored within the solar system are cached here. May not be latest value and can be changed without notice.
+<<<<<<< HEAD
 	float m_LastOffset, m_LastSizeScale, m_LastDistanceScale;
+=======
+	float m_LastOffset, m_LastRadiusScale, m_LastDistanceScale;
+>>>>>>> refs/remotes/origin/orbit
 
 private:
 	// Whether or not to have an atmosphere
@@ -106,7 +127,11 @@ private:
 	AAtmosphere *m_Atmosphere;
 
 	// Whether or not to draw the orbit
+<<<<<<< HEAD
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Orbit"))
+=======
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Orbit"))
+>>>>>>> refs/remotes/origin/orbit
 	bool m_bDrawOrbit;
 
 	// How many samples to take for the orbit render
@@ -165,6 +190,22 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orbit", meta = (AllowPrivateAccess = "true", DisplayName = "Rotate Clockwise (orbit)"))
 	bool m_RotateOrbitClockwise;
 
+	// Velocity scale multiplier (1.0 = default. Touching this will completely mess up the accuracy of days per year)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scale", meta = (AllowPrivateAccess = "true", DisplayName = "Velocity Scale (%)"))
+	float m_VelocityScale;
+
+	// Rotation scale multiplier (1.0 = default. Touching this will completely mess up the accuracy of days per year)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scale", meta = (AllowPrivateAccess = "true", DisplayName = "Rotation Scale (%)"))
+	float m_RotationScale;
+
+	// Planet radius multiplier (1.0f = default according to solar system object)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scale", meta = (AllowPrivateAccess = "true", DisplayName = "Radius Scale (%)"))
+	float m_RadiusScale;
+
+	// Orbit distance multiplier (1.0 = default distance according to solar system object)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scale", meta = (AllowPrivateAccess = "true", DisplayName = "Orbit Distance Scale (%)"))
+	float m_OrbitDistanceScale;
+
 	// Gravity on the surface of the body (m/s)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Characteristics", meta = (AllowPrivateAccess = "true", DisplayName = "Gravity (m/s)"))
 	float m_Gravity;
@@ -174,7 +215,7 @@ private:
 	float m_Mass;
 
 	// Radius of the body (km)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Characteristics", meta = (AllowPrivateAccess = "true", DisplayName = "Radius (km)"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Characteristics", meta = (AllowPrivateAccess = "true", DisplayName = "Radius (km)"))
 	float m_Radius;
 
 	// Body tilt
@@ -194,61 +235,121 @@ private:
 	bool m_RotatePlanetClockwise;
 
 public:
+<<<<<<< HEAD
 	FORCEINLINE AAtmosphere* GetAtmosphere() { return this->m_Atmosphere; }
 
 	FORCEINLINE FAtmosphereData& GetAtmosphereData() { return this->m_AtmosphereData; }
 
 	FORCEINLINE const float& GetFurthestDistance() const { return this->m_FurthestDistance; }
+=======
+	UFUNCTION(BlueprintPure, Category = "Atmosphere")
+	AAtmosphere* GetAtmosphere() const { return this->m_Atmosphere; }
 
-	FORCEINLINE const float& GetNearestDistance() const { return this->m_NearestDistance; }
+	UFUNCTION(BlueprintPure, Category = "Atmosphere")
+	FAtmosphereData& GetAtmosphereData() { return this->m_AtmosphereData; }
 
-	FORCEINLINE const float& GetSemiMajorAxis() const { return this->m_SemiMajorAxis; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	const float& GetFurthestDistance() const { return this->m_FurthestDistance; }
 
-	FORCEINLINE const float& GetSemiMinorAxis() const { return this->m_SemiMinorAxis; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	const float& GetNearestDistance() const { return this->m_NearestDistance; }
 
-	FORCEINLINE const float& GetEccentricity() const { return this->m_Eccentricity; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	const float& GetSemiMajorAxis() const { return this->m_SemiMajorAxis; }
 
-	FORCEINLINE const float& GetPerimeter() const { return this->m_Perimeter; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	const float& GetSemiMinorAxis() const { return this->m_SemiMinorAxis; }
 
-	FORCEINLINE const float& GetOrbitPeriod() const { return this->m_OrbitPeriod; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	const float& GetEccentricity() const { return this->m_Eccentricity; }
 
-	FORCEINLINE const float& GetGravity() const { return this->m_Gravity; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	const float& GetPerimeter() const { return this->m_Perimeter; }
 
-	FORCEINLINE const float& GetMass() const { return this->m_Mass; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	const float& GetOrbitPeriod() const { return this->m_OrbitPeriod; }
 
-	FORCEINLINE const float& GetRadius() const { return this->m_Radius; }
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	const float& GetGravity() const { return this->m_Gravity; }
 
-	FORCEINLINE const float& GetAxialTilt() const { return this->m_AxialTilt; }
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	const float& GetMass() const { return this->m_Mass; }
+>>>>>>> refs/remotes/origin/orbit
 
-	FORCEINLINE const float& GetRotationPeriod() const { return this->m_RotationPeriod; }
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	const float& GetRadius() const { return this->m_Radius; }
 
-	FORCEINLINE void SetMinVelocity(const float& velocity) { this->m_MinSpeed = velocity; }
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	const float& GetAxialTilt() const { return this->m_AxialTilt; }
 
-	FORCEINLINE void SetMaxVelocity(const float& velocity) { this->m_MaxSpeed = velocity; }
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	const float& GetRotationPeriod() const { return this->m_RotationPeriod; }
 
-	FORCEINLINE void SetFurthestDistance(const float& km) { this->m_FurthestDistance = km; }
+	UFUNCTION(BlueprintPure, Category = "Scale")
+	const float& GetVelocityScale() const { return this->m_VelocityScale; }
 
-	FORCEINLINE void SetNearestDistance(const float& km) { this->m_NearestDistance = km; }
+	UFUNCTION(BlueprintPure, Category = "Scale")
+	const float& GetRotationScale() const { return this->m_RotationScale; }
 
-	FORCEINLINE void SetSemiMajorAxis(const float& km) { this->m_SemiMajorAxis = km; this->CalculateSemiMinorAxis(); this->CalculatePerimeter(); }
+	UFUNCTION(BlueprintPure, Category = "Scale")
+	const float& GetRadiusScale() const { return this->m_RadiusScale; }
 
-	FORCEINLINE void SetEccentricity(const float& eccentricity) { this->m_Eccentricity = eccentricity; this->CalculateSemiMinorAxis(); this->CalculatePerimeter(); }
+	UFUNCTION(BlueprintPure, Category = "Scale")
+	const float& GetOrbitDistanceScale() const { return this->m_OrbitDistanceScale; }
 
-	FORCEINLINE void SetOrbitPeriod(const float& days) { this->m_OrbitPeriod = days; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	void SetMinVelocity(const float& velocity) { this->m_MinSpeed = velocity; }
 
-	FORCEINLINE void SetRotateOrbitClockwise(const bool& clockwise) { this->m_RotateOrbitClockwise = clockwise; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	void SetMaxVelocity(const float& velocity) { this->m_MaxSpeed = velocity; }
 
-	FORCEINLINE void SetGravity(const float& ms) { this->m_Gravity = ms; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	void SetFurthestDistance(const float& km) { this->m_FurthestDistance = km; }
 
-	FORCEINLINE void SetMass(const float& kg24) { this->m_Mass = kg24; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	void SetNearestDistance(const float& km) { this->m_NearestDistance = km; }
 
-	FORCEINLINE void SetRadius(const float& km) { this->m_Radius = km; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	void SetSemiMajorAxis(const float& km) { this->m_SemiMajorAxis = km; this->CalculateSemiMinorAxis(); this->CalculatePerimeter(); }
 
-	FORCEINLINE void SetAxialTilt(const float& degrees) { this->m_AxialTilt = degrees; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	void SetEccentricity(const float& eccentricity) { this->m_Eccentricity = eccentricity; this->CalculateSemiMinorAxis(); this->CalculatePerimeter(); }
 
-	FORCEINLINE void SetRotationPeriod(const float& seconds) { this->m_RotationPeriod = seconds; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	void SetOrbitPeriod(const float& days) { this->m_OrbitPeriod = days; }
 
-	FORCEINLINE void SetRotatePlanetClockwise(const bool& clockwise) { this->m_RotatePlanetClockwise = clockwise; }
+	UFUNCTION(BlueprintPure, Category = "Orbit")
+	void SetRotateOrbitClockwise(const bool& clockwise) { this->m_RotateOrbitClockwise = clockwise; }
+
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	void SetGravity(const float& ms) { this->m_Gravity = ms; }
+
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	void SetMass(const float& kg24) { this->m_Mass = kg24; }
+
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	void SetRadius(const float& km) { this->m_Radius = km; this->SetScale(this->m_LastRadiusScale); }
+
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	void SetAxialTilt(const float& degrees) { this->m_AxialTilt = degrees; }
+
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	void SetRotationPeriod(const float& seconds) { this->m_RotationPeriod = seconds; }
+
+	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	void SetRotatePlanetClockwise(const bool& clockwise) { this->m_RotatePlanetClockwise = clockwise; }
+
+	UFUNCTION(BlueprintPure, Category = "Scale")
+	void SetVelocityScale(const float& scale) { this->m_VelocityScale = scale; }
+
+	UFUNCTION(BlueprintPure, Category = "Scale")
+	void SetRotationScale(const float& scale) { this->m_RotationScale = scale; }
+
+	UFUNCTION(BlueprintPure, Category = "Scale")
+	void SetRadiusScale(const float& scale) { this->m_RadiusScale = scale; this->SetScale(this->m_LastRadiusScale); }
+
+	UFUNCTION(BlueprintPure, Category = "Scale")
+	void SetOrbitDistanceScale(const float& scale) { this->m_OrbitDistanceScale = scale; }
 
 	UFUNCTION(BlueprintCallable, Category = "Time")
 	static float CalculateTimeToSeconds(const float& days, const float& hours, const float& minutes, const float& seconds)
