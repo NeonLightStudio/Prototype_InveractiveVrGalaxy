@@ -9,10 +9,29 @@
 #define SPHERE_MESH_LOCATION TEXT("StaticMesh'/Game/VirtualRealityBP/Blueprints/Planets/SphereMesh.SphereMesh'")
 
 // Sets default values
-ACelestialBody::ACelestialBody() : m_Material(nullptr), m_ParticleSystem(nullptr), m_bDrawAtmosphere(false), 
-	m_Atmosphere(nullptr), m_bDrawOrbit(false), m_OrbitParticleResolution(20), m_OrbitColor(FLinearColor::White), m_CurrentSpeed(0.0f), 
-	m_Angle(0.0f), m_RotateOrbitClockwise(true), m_VelocityScale(1.0f), m_RotationScale(1.0f), m_RadiusScale(1.0f), m_OrbitDistanceScale(1.0f)
+ACelestialBody::ACelestialBody() : m_Material(nullptr), m_Atmosphere(nullptr), m_Orbit(nullptr)
 {
+	// Atmosphere
+	this->m_bDrawAtmosphere = false;
+
+	// Draw Orbit
+	this->m_bDrawOrbit = false;
+	this->m_DrawOrbitRadius = 40.0f;
+	this->m_DrawOrbitResolution = 50;
+	this->m_DrawOrbitColor = FLinearColor(1.0f, 1.0f, 1.0f, 0.25f);
+
+	// Orbit
+	this->m_CurrentSpeed = 0.0f;
+	this->m_Angle = 0.0f;
+	this->m_RotateOrbitClockwise = true;
+
+	// Scale
+	this->m_VelocityScale = 1.0f;
+	this->m_RotationScale = 1.0f;
+	this->m_RadiusScale = 1.0f;
+	this->m_OrbitDistanceScale = 1.0f;
+
+	// Other
 	this->m_Root = UObject::CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyRoot"));
 	Super::RootComponent = this->m_Root;
 
@@ -20,12 +39,6 @@ ACelestialBody::ACelestialBody() : m_Material(nullptr), m_ParticleSystem(nullptr
 	if (sphere.Succeeded())
 	{
 		this->m_Root->SetStaticMesh(sphere.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> particleRef(TEXT("ParticleSystem'/Game/VirtualRealityBP/Materials/Beam/P_Beam.P_Beam'"));
-	if(particleRef.Succeeded())
-	{
-		this->m_ParticleSystem = particleRef.Object;
 	}
 }
 
@@ -76,11 +89,6 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 		this->m_bDrawOrbit = !this->m_bDrawOrbit;
 		this->SetDrawOrbit(!this->m_bDrawOrbit);
 	}
-	if(this->m_bDrawOrbit && (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_OrbitColor)
-		|| name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_OrbitParticleResolution)))
-	{
-		this->ResetDrawOrbit();
-	}
 	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_bDrawAtmosphere))
 	{
 		this->m_bDrawAtmosphere = !this->m_bDrawAtmosphere;
@@ -90,6 +98,22 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 	{
 		this->SetRadiusScale(this->m_RadiusScale);
 	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_DrawOrbitRadius) && this->m_Orbit != nullptr)
+	{
+		this->m_Orbit->SetRadius(this->m_DrawOrbitRadius);
+		this->m_Orbit->UpdateOrbit();
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_DrawOrbitColor) && this->m_Orbit != nullptr)
+	{
+		this->m_Orbit->SetColor(this->m_DrawOrbitColor);
+		this->m_Orbit->UpdateOrbit();
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_DrawOrbitResolution) && this->m_Orbit != nullptr)
+	{
+		this->SetDrawOrbit(false);
+		this->SetDrawOrbit(true);
+	}
+	
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
@@ -136,16 +160,6 @@ FVector ACelestialBody::CalculatePosition(const float& radians, const float& off
 	return Super::GetAttachParentActor()->GetActorLocation() + vector;
 }
 
-void ACelestialBody::ResetDrawOrbit()
-{
-	if(!this->m_bDrawOrbit)
-	{
-		return;
-	}
-	this->SetDrawOrbit(false);
-	this->SetDrawOrbit(true);
-}
-
 void ACelestialBody::SetDrawAtmosphere(const bool& draw)
 {
 	if(this->m_bDrawAtmosphere == draw)
@@ -180,7 +194,7 @@ void ACelestialBody::SetDrawAtmosphere(const bool& draw)
 
 void ACelestialBody::SetDrawOrbit(const bool& draw)
 {
-	if(this->m_bDrawOrbit == draw || (draw && this->m_ParticleSystem == nullptr))
+	if (this->m_bDrawOrbit == draw)
 	{
 		return;
 	}
@@ -189,40 +203,86 @@ void ACelestialBody::SetDrawOrbit(const bool& draw)
 	{
 		return;
 	}
-	if(!draw)
+	if (!draw)
 	{
-		for(int i = 0; i < this->m_OrbitParticleSystems.Num(); i++)
+		if (this->m_Orbit != nullptr)
 		{
-			this->m_OrbitParticleSystems[i]->DestroyComponent();
+			this->m_Orbit->Destroy();
+			this->m_Orbit = nullptr;
 		}
-		this->m_OrbitParticleSystems.Empty();
 	}
 	else
 	{
-		check(this->m_OrbitParticleResolution >= 0);
-
-		FVector prevLoc = this->m_Root->GetComponentLocation();
-		for(int i = 0; i < this->m_OrbitParticleResolution; i++)
+		AActor *parent = Super::GetAttachParentActor();
+		if(parent == nullptr)
 		{
-			UParticleSystemComponent *system = UGameplayStatics::SpawnEmitterAtLocation(Super::GetWorld(),
-				this->m_ParticleSystem, this->m_Root->GetComponentLocation(), FRotator::ZeroRotator, false);
-			if(system == nullptr)
-			{
-				continue;
+			this->m_bDrawOrbit = false;
+			return;
+		}
+		this->m_Orbit = (AOrbit*)Super::GetWorld()->SpawnActor(AOrbit::StaticClass());
+		if (this->m_Orbit)
+		{
+			TArray<FVector> points;
+			for (int i = 0; i < this->m_DrawOrbitResolution; i++)
+			{	
+				float delta = PI2 * (i + 1) / this->m_DrawOrbitResolution;
+				points.Add(this->CalculatePosition(delta, this->m_LastOffset, this->m_LastDistanceScale) - parent->GetActorLocation());
 			}
-			float currentRad = PI2 * (i + 1) / this->m_OrbitParticleResolution;
-			FVector target = this->CalculatePosition(currentRad, this->m_LastOffset, this->m_LastDistanceScale);
-			system->SetBeamSourcePoint(0, prevLoc, 0);
-			system->SetBeamTargetPoint(0, prevLoc = target, 0);
+			this->m_Orbit->SetPoints(points);
+			this->m_Orbit->SetColor(this->m_DrawOrbitColor);
+			this->m_Orbit->SetRadius(this->m_DrawOrbitRadius);
+			this->m_Orbit->AttachToActor(parent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-			system->SetColorParameter(FName("InitialColor"), this->m_OrbitColor);
-			// Set the scale of the beam to be equal to the bodies scale. Has an additional multiplier to increase or decrease the scale using the bodies as a base.
-			system->SetWorldScale3D(FVector(ORBIT_BEAM_SCALE_MULTIPLIER * this->GetRadiusWithScale() * 2.0f));
-
-			this->m_OrbitParticleSystems.Add(system);
+			this->m_Orbit->UpdateOrbit();
 		}
 	}
 }
+
+//void ACelestialBody::SetDrawOrbit(const bool& draw)
+//{
+//	if(this->m_bDrawOrbit == draw || (draw && this->m_ParticleSystem == nullptr))
+//	{
+//		return;
+//	}
+//	this->m_bDrawOrbit = draw;
+//	if (Super::GetWorld() == nullptr)
+//	{
+//		return;
+//	}
+//	if(!draw)
+//	{
+//		for(int i = 0; i < this->m_OrbitParticleSystems.Num(); i++)
+//		{
+//			this->m_OrbitParticleSystems[i]->DestroyComponent();
+//		}
+//		this->m_OrbitParticleSystems.Empty();
+//	}
+//	else
+//	{
+//		check(this->m_OrbitParticleResolution >= 0);
+//
+//		FVector prevLoc = this->m_Root->GetComponentLocation();
+//		for(int i = 0; i < this->m_OrbitParticleResolution; i++)
+//		{
+//			UParticleSystemComponent *system = UGameplayStatics::SpawnEmitterAtLocation(Super::GetWorld(),
+//				this->m_ParticleSystem, this->m_Root->GetComponentLocation(), FRotator::ZeroRotator, false);
+//			if(system == nullptr)
+//			{
+//				continue;
+//			}
+//			float currentRad = PI2 * (i + 1) / this->m_OrbitParticleResolution;
+//			FVector target = this->CalculatePosition(currentRad, this->m_LastOffset, this->m_LastDistanceScale);
+//			system->SetBeamSourcePoint(0, prevLoc, 0);
+//			system->SetBeamTargetPoint(0, prevLoc = target, 0);
+//
+//			system->SetColorParameter(FName("InitialColor"), this->m_OrbitColor);
+//			// Set the scale of the beam to be equal to the bodies scale. Has an additional multiplier to increase or decrease the scale using the bodies as a base.
+//			system->SetWorldScale3D(FVector(ORBIT_BEAM_SCALE_MULTIPLIER * this->GetRadiusWithScale() * 2.0f));
+//
+//			this->m_OrbitParticleSystems.Add(system);
+//		}
+//	}
+//}
 
 void ACelestialBody::Move(const ACelestialBody *center, const float& multiplier, const float& distanceScale)
 {

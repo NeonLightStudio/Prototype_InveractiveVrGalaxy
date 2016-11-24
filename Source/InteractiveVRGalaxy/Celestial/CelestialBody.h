@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "Atmosphere.h"
+#include "Orbit.h"
 #include "CelestialBody.generated.h"
 
 #define DAYS
@@ -44,13 +45,12 @@ public:
 	// Calculate the position of the body using the orbit angle, distance offset, and distance scale
 	FVector CalculatePosition(const float& radians, const float& offset, const float& distanceScale) const;
 
-	// Update the orbit. Must be called whenever the orbit parameters are changed. (Otherwise no changes will happen)
-	void ResetDrawOrbit();
-
 	// Whether or not to draw the orbit of this body
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetDrawOrbit(const bool& draw);
 
 	// Whether or not the draw the atmosphere of this body
+	UFUNCTION(BlueprintCallable, Category = "Atmosphere")
 	void SetDrawAtmosphere(const bool& enable);
 
 	// Move this body along its orbit. Requires the center, speed multiplier, and orbit distance scale
@@ -87,14 +87,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Satellites", meta = (AllowPrivateAccess = "true", DisplayName = "Satellites"))
 	TArray<TSubclassOf<ACelestialBody>> m_Satellites;
 
-	// Beam particle used for orbit render
-	UPROPERTY()
-	UParticleSystem *m_ParticleSystem;
-
-	// All of the active particle systems (only has content when the orbit is being rendered)
-	UPROPERTY()
-	TArray<UParticleSystemComponent*> m_OrbitParticleSystems;
-
 	// Parameters stored within the solar system are cached here. May not be latest value and can be changed without notice.
 	float m_LastOffset, m_LastRadiusScale, m_LastDistanceScale;
 
@@ -111,17 +103,24 @@ private:
 	UPROPERTY()
 	AAtmosphere *m_Atmosphere;
 
+	UPROPERTY()
+	AOrbit *m_Orbit;
+
 	// Whether or not to draw the orbit
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Orbit"))
 	bool m_bDrawOrbit;
 
+	// Whether or not to draw the orbit
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Radius"))
+	float m_DrawOrbitRadius;
+
 	// How many samples to take for the orbit render
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Resolution"))
-	int m_OrbitParticleResolution;
+	int m_DrawOrbitResolution;
 
 	// Color of the orbit
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OrbitRender", meta = (AllowPrivateAccess = "true", DisplayName = "Draw Color"))
-	FLinearColor m_OrbitColor;
+	FLinearColor m_DrawOrbitColor;
 
 	// Minimum orbit speed (Speed at Aphelion)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orbit", meta = (AllowPrivateAccess = "true", DisplayName = "Min Speed (km/s)"))
