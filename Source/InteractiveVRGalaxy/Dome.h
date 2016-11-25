@@ -46,5 +46,6 @@ private:
 
 	float m_DomeStateTime;
 	//bool m_DomeStateComplete;
+
 	EDomeState m_DomeState, m_NextDomeState;
 };
