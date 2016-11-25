@@ -29,13 +29,13 @@ public:
 	// Called every frame
 	virtual void Tick(float delta) override;
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetTimeScale(const float& scale) { this->m_TimeScale = scale; }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetRadiusScale(const float& scale) { this->m_RadiusScale = scale; this->bScaleUpdateRequired = true; }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetOrbitDistanceScale(const float& scale) { this->m_OrbitDistanceScale = scale; this->bScaleUpdateRequired = true; }
 
 private:
