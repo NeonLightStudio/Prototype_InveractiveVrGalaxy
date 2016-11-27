@@ -269,58 +269,58 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Scale")
 	const float& GetOrbitDistanceScale() const { return this->m_OrbitDistanceScale; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetMinVelocity(const float& velocity) { this->m_MinSpeed = velocity; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetMaxVelocity(const float& velocity) { this->m_MaxSpeed = velocity; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetFurthestDistance(const float& km) { this->m_FurthestDistance = km; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetNearestDistance(const float& km) { this->m_NearestDistance = km; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetSemiMajorAxis(const float& km) { this->m_SemiMajorAxis = km; this->CalculateSemiMinorAxis(); this->CalculatePerimeter(); }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetEccentricity(const float& eccentricity) { this->m_Eccentricity = eccentricity; this->CalculateSemiMinorAxis(); this->CalculatePerimeter(); }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetOrbitPeriod(const float& days) { this->m_OrbitPeriod = days; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetRotateOrbitClockwise(const bool& clockwise) { this->m_RotateOrbitClockwise = clockwise; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetGravity(const float& ms) { this->m_Gravity = ms; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetMass(const float& kg24) { this->m_Mass = kg24; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetRadius(const float& km) { this->m_Radius = km; this->SetScale(this->m_LastRadiusScale); }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetAxialTilt(const float& degrees) { this->m_AxialTilt = degrees; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetRotationPeriod(const float& seconds) { this->m_RotationPeriod = seconds; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetRotatePlanetClockwise(const bool& clockwise) { this->m_RotatePlanetClockwise = clockwise; }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetVelocityScale(const float& scale) { this->m_VelocityScale = scale; }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetRotationScale(const float& scale) { this->m_RotationScale = scale; }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetRadiusScale(const float& scale) { this->m_RadiusScale = scale; this->SetScale(this->m_LastRadiusScale); }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetOrbitDistanceScale(const float& scale) { this->m_OrbitDistanceScale = scale; }
 
 	UFUNCTION(BlueprintCallable, Category = "Time")
