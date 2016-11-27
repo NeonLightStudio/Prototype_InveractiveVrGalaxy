@@ -54,7 +54,7 @@ public:
 	void SetDrawAtmosphere(const bool& enable);
 
 	// Move this body along its orbit. Requires the center, speed multiplier, and orbit distance scale
-	void Move(const ACelestialBody *center, const float& multiplier, const float& distanceScale);
+	void Move(const ACelestialBody *center, const float& timeScale, const float& distanceScale, const float& delta);
 
 	FORCEINLINE USceneComponent* GetRootComponent() const { return this->m_Root; }
 
@@ -214,6 +214,18 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Characteristics", meta = (AllowPrivateAccess = "true", DisplayName = "Rotate Clockwise (planet)"))
 	bool m_RotatePlanetClockwise;
 
+	// Whether or not to move and rotate the body
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true", DisplayName = "Move Body"))
+	bool m_bMoveBody;
+	bool m_bMoveBodyTransition; // should be true if the body is in transition mode
+
+	// Time taken for the body to return to its proper position after MoveBody is toggled (seconds)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true", DisplayName = "Transition Delay (seconds)"))
+	float m_TransitionDelay;
+	float m_TransitionTimer;
+	FVector m_TransitionPosStart;
+	FRotator m_TransitionRotStart;
+
 public:
 	UFUNCTION(BlueprintPure, Category = "Atmosphere")
 	AAtmosphere* GetAtmosphere() const { return this->m_Atmosphere; }
@@ -322,6 +334,19 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetOrbitDistanceScale(const float& scale) { this->m_OrbitDistanceScale = scale; }
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void SetMoveBody(const bool& move)
+	{
+		this->m_bMoveBody = move; 
+		this->m_bMoveBodyTransition = move; 
+		if (move)
+		{
+			this->m_TransitionTimer = 0.0f;
+			this->m_TransitionPosStart = this->m_Root->GetComponentLocation();
+			this->m_TransitionRotStart = this->m_Root->GetComponentRotation();
+		}
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Time")
 	static float CalculateTimeToSeconds(const float& days, const float& hours, const float& minutes, const float& seconds)
