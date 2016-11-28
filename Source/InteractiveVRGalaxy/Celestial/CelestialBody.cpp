@@ -38,6 +38,10 @@ ACelestialBody::ACelestialBody() : m_Material(nullptr), m_Atmosphere(nullptr), m
 
 	// Other
 	this->m_Root = UObject::CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyRoot"));
+	if(this->m_Material)
+	{
+		this->m_Root->SetMaterial(0, this->m_Material);
+	}
 	Super::RootComponent = this->m_Root;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> sphere(SPHERE_MESH_LOCATION);
@@ -61,10 +65,6 @@ void ACelestialBody::BeginPlay()
 	{
 		this->m_bDrawAtmosphere = false;
 		this->SetDrawAtmosphere(true);
-	}
-	if (this->m_Material)
-	{
-		this->m_Root->SetMaterial(0, this->m_Material);
 	}
 	this->m_Root->SetRelativeRotation(FQuat(FVector(0.0f, 1.0f, 0.0f), -this->m_AxialTilt * DEG_TO_RAD));
 }

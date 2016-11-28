@@ -56,7 +56,7 @@ public:
 	// Move this body along its orbit. Requires the center, speed multiplier, and orbit distance scale
 	void Move(const ACelestialBody *center, const float& timeScale, const float& distanceScale, const float& delta);
 
-	FORCEINLINE USceneComponent* GetRootComponent() const { return this->m_Root; }
+	FORCEINLINE UStaticMeshComponent* GetRootComponent() const { return this->m_Root; }
 
 	FORCEINLINE const TArray<TSubclassOf<ACelestialBody>>& GetSatellites() const { return this->m_Satellites; }
 
