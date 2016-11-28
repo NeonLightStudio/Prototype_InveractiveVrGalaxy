@@ -35,7 +35,7 @@
 #define DOME_MATERIAL_LOCATION "Material'/Game/VirtualRealityBP/Materials/M_DomeMaterial.M_DomeMaterial'"
 
 // Sets default values
-ADome::ADome() : m_MaterialInstance(nullptr), /*m_DomeStateTime(0.0f),*/ m_DomeState(EDomeState::Close), m_NextDomeState(EDomeState::Undefined)
+ADome::ADome() : m_MaterialInstance(nullptr), m_DomeState(EDomeState::Close), m_NextDomeState(EDomeState::Undefined)
 {
 	// Set the mesh of this component to the Dome Mesh
 	this->m_Mesh = UObject::CreateDefaultSubobject<UDomeMeshComponent>(TEXT("DomeMesh"));
@@ -113,6 +113,8 @@ void ADome::SetDomeState(const EDomeState& state)
 {
 	this->m_DomeTimer = 0.0f;
 	this->m_NextDomeState = state;
+	this->m_bTransparentClose = state == EDomeState::Close
+		&& this->m_DomeState == EDomeState::Transparent;
 }
 
 // Called every frame
@@ -139,14 +141,14 @@ void ADome::Tick(float delta)
 
 			float color = 1.0f, displace = 0.0f, fade = 0.0f;
 			float time = this->m_DomeTimer;
-			if(this->m_NextDomeState == EDomeState::Close)
+			if (this->m_NextDomeState == EDomeState::Close)
 			{
 				color = 0.0f;
 				time = ANIMATION_DURATION - time;
 			}
-			displace = FMath::Clamp(((time - startDelay) - (ANIMATION_DURATION - displaceDuration)) / displaceDuration, 0.0f, 1.0f);
+			displace = FMath::Clamp(((time - startDelay) - (ANIMATION_DURATION - displaceDuration)) / (displaceDuration - startDelay), 0.0f, 1.0f);
 			fade = FMath::Clamp((time - startDelay) / colorDuration, 0.0f, 1.0f);
-			if (this->m_NextDomeState == EDomeState::Transparent)
+			if (this->m_NextDomeState == EDomeState::Transparent || this->m_bTransparentClose)
 			{
 				color = 0.0f;
 				displace = 0.0f;

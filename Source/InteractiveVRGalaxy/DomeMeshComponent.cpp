@@ -81,5 +81,5 @@ void UDomeMeshComponent::CreateDome()
 			Super::CreateMeshSection(count++, vertices, indices, normals, uv, TArray<FColor>(), TArray<FProcMeshTangent>(), DOME_COLLISION);
 		}
 	}
-	UE_LOG(LogClass, Log, TEXT("Section Counter: %d"), Super::GetNumSections());
+	//UE_LOG(LogClass, Log, TEXT("Section Counter: %d"), Super::GetNumSections());
 }

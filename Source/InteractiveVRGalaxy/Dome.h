@@ -48,6 +48,7 @@ private:
 	class UDomeMeshComponent *m_Mesh;
 
 	float m_DomeTimer;
+	bool m_bTransparentClose;
 
 	//float m_DomeStateTime;
 	//bool m_DomeStateComplete;
