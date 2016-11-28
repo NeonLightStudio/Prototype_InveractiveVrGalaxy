@@ -17,12 +17,6 @@ public:
 	UDomeMeshComponent();
 
 	void BeginPlay() override;
-
-	//void SetOpaque();
-
-	//void SetTransparent();
-
-	//void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dome", meta = (DisplayName = "Vertical Segments"))
