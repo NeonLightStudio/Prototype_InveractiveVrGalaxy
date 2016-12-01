@@ -25,6 +25,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dome", meta = (DisplayName = "Horizontal Segments"))
 	int m_HorizontalSegments;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dome", meta = (DisplayName = "Full Sphere"))
+	bool m_bFullSphere;
+
 private:
 	UFUNCTION(BlueprintCallable, Category = "Dome")
 	void CreateDome();
