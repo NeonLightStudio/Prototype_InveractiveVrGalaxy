@@ -3,6 +3,8 @@
 #include "InteractiveVRGalaxy.h"
 #include "SolarSystem.h"
 
+#define MATERIAL_NAME_SUN_LOCATION FName("Sun Location")
+
 // Sets default values
 ASolarSystem::ASolarSystem() : m_TimeScale(1.0f), m_RadiusScale(1.0f), m_OrbitDistanceScale(1.0f), 
 	m_CenterOffset(0.0f), m_CenterActor(nullptr), bScaleUpdateRequired(false)
@@ -50,7 +52,7 @@ void ASolarSystem::SpawnBodies(AActor *parent, const TArray<TSubclassOf<ACelesti
 		UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(root->GetMaterial(0), actor);
 		if (material != nullptr)
 		{
-			material->SetVectorParameterValue(FName("Sun Location"), Super::GetActorLocation());
+			material->SetVectorParameterValue(MATERIAL_NAME_SUN_LOCATION, Super::GetActorLocation());
 
 			root->SetMaterial(0, material);
 		}

@@ -5,7 +5,8 @@
 #include "CelestialBody.h"
 #include "Atmosphere.h"
 
-#define MATERIAL_NAME_ATMOSPHERE_COLOR TEXT("AtmosphereColor")
+#define MATERIAL_NAME_SUN_LOCATION FName("Sun Location")
+#define MATERIAL_NAME_ATMOSPHERE_COLOR FName("AtmosphereColor")
 
 #define SPHERE_MESH_LOCATION TEXT("StaticMesh'/Game/VirtualRealityBP/Blueprints/Planets/SphereMesh.SphereMesh'")
 #define ATMOSPHERE_MATERIAL_LOCATION TEXT("Material'/Game/VirtualRealityBP/Materials/Planets/M_Atmosphere.M_Atmosphere'")
@@ -47,6 +48,12 @@ void AAtmosphere::UpdateAtmosphere() const
 	if (parent != nullptr && parent->IsA(ACelestialBody::StaticClass()))
 	{
 		ACelestialBody *body = (ACelestialBody*)parent;
+
+		// Update sun location
+		UMaterialInstanceDynamic *parentMaterial = (UMaterialInstanceDynamic*)body->GetRootComponent()->GetMaterial(0);//UMaterialInstanceDynamic::Create(body->GetRootComponent()->GetMaterial(0), body);
+		FLinearColor sunLocation;
+		parentMaterial->GetVectorParameterValue(MATERIAL_NAME_SUN_LOCATION, sunLocation);
+		this->m_Material->SetVectorParameterValue(MATERIAL_NAME_SUN_LOCATION, sunLocation);
 
 		//UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(this->m_Root->GetMaterial(0), this->m_Root); 
 		this->m_Material->SetVectorParameterValue(MATERIAL_NAME_ATMOSPHERE_COLOR, this->m_Data->m_Color);
