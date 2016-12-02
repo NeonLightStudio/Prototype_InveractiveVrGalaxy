@@ -9,7 +9,7 @@
 #define SPHERE_MESH_LOCATION TEXT("StaticMesh'/Game/VirtualRealityBP/Blueprints/Planets/SphereMesh.SphereMesh'")
 
 // Sets default values
-ACelestialBody::ACelestialBody() : m_Material(nullptr), m_Atmosphere(nullptr), m_Orbit(nullptr)
+ACelestialBody::ACelestialBody() : m_Material(nullptr), m_MaterialDynamic(nullptr), m_Atmosphere(nullptr), m_Orbit(nullptr)
 {
 	// Atmosphere
 	this->m_bDrawAtmosphere = false;
@@ -36,6 +36,12 @@ ACelestialBody::ACelestialBody() : m_Material(nullptr), m_Atmosphere(nullptr), m
 	this->m_bMoveBodyTransition = false;
 	this->m_TransitionDelay = 1.0f;
 
+<<<<<<< HEAD
+=======
+	// World
+	this->m_SunLocation = FVector(0.0f);
+
+>>>>>>> refs/remotes/origin/master
 	// Other
 	this->m_Root = UObject::CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyRoot"));
 	if(this->m_Material)
@@ -56,6 +62,14 @@ void ACelestialBody::BeginPlay()
 	this->CalculateSemiMinorAxis();
 	this->CalculatePerimeter();
 
+	// Check to see if this planet has been spawned without a solar system
+	if(Super::GetAttachParentActor() == nullptr)
+	{
+		this->SetScale(1.0f);
+	}
+	this->m_MaterialDynamic = UMaterialInstanceDynamic::Create(this->m_Material, this->m_Root);
+
+	this->SetSunLocation(this->m_SunLocation);
 	if(this->m_bDrawOrbit)
 	{
 		this->m_bDrawOrbit = false;
@@ -83,7 +97,9 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 	}
 	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_Material))
 	{
-		this->m_Root->SetMaterial(0, this->m_Material);
+		this->m_MaterialDynamic = UMaterialInstanceDynamic::Create(this->m_Material, this->m_Root);
+		// Update material parameters
+		this->SetSunLocation(this->m_SunLocation);
 	}
 	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_AxialTilt))
 	{
@@ -122,10 +138,33 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 	{
 		this->SetMoveBody(this->m_bMoveBody);
 	}
+<<<<<<< HEAD
 	
+=======
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_SunLocation))
+	{
+		this->SetSunLocation(this->m_SunLocation);
+	}
+
+>>>>>>> refs/remotes/origin/master
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
+
+void ACelestialBody::SetSunLocation(const FVector& location)
+{
+	this->m_SunLocation = location;
+	
+	if(this->m_MaterialDynamic)
+	{
+		this->m_MaterialDynamic->SetVectorParameterValue(MATERIAL_NAME_SUN_LOCATION, this->m_SunLocation);
+		this->m_Root->SetMaterial(0, this->m_MaterialDynamic);
+	}
+	if(this->m_Atmosphere != nullptr)
+	{
+		this->m_Atmosphere->UpdateAtmosphere();
+	}
+}
 
 void ACelestialBody::SetScale(const float& scale)
 {

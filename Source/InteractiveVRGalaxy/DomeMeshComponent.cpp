@@ -16,6 +16,9 @@ UDomeMeshComponent::UDomeMeshComponent()
 	// Set default horizontal segments
 	this->m_HorizontalSegments = DOME_HORIZONTAL_SEGMENTS;
 
+	// Set to only generate half a sphere
+	this->m_bFullSphere = false;
+
 	//this->CreateDome(); // Can't create mesh here. It must be done after the initialization of the instance (BeginPlay)
 }
 
@@ -35,7 +38,8 @@ void UDomeMeshComponent::CreateDome()
 	const float delta = PI / this->m_HorizontalSegments;
 	for (float longitude = 0.0f; longitude < PI2 - theta; longitude += theta)
 	{
-		for (float latitude = 0.0f; latitude < PI / 2.0f; latitude += delta)
+		float latMax = this->m_bFullSphere ? PI : PI / 2.0f;
+		for (float latitude = 0.0f; latitude < latMax; latitude += delta)
 		{
 			TArray<FVector> vertices, normals;
 			TArray<FVector2D> uv;

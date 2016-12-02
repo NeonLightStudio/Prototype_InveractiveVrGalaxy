@@ -14,6 +14,8 @@
 #define TIME_TO_SECONDS(days, hours, minutes, seconds) (((((days * 24.0f) + hours) * 60.0f) + minutes) * 60.0f + seconds)
 #define SECONDS_TO_DAYS(seconds) (seconds * 60.0f * 60.0f * 24.0f)
 
+#define MATERIAL_NAME_SUN_LOCATION FName("Sun Location")
+
 UCLASS(abstract)
 class INTERACTIVEVRGALAXY_API ACelestialBody : public AActor
 {
@@ -83,6 +85,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material", meta = (AllowPrivateAccess = "true", DisplayName = "Material"))
 	UMaterialInterface *m_Material;
+
+	UPROPERTY()
+	UMaterialInstanceDynamic *m_MaterialDynamic;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Satellites", meta = (AllowPrivateAccess = "true", DisplayName = "Satellites"))
 	TArray<TSubclassOf<ACelestialBody>> m_Satellites;
@@ -214,6 +219,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Characteristics", meta = (AllowPrivateAccess = "true", DisplayName = "Rotate Clockwise (planet)"))
 	bool m_RotatePlanetClockwise;
 
+<<<<<<< HEAD
+=======
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "World", meta = (AllowPrivateAccess = "true", DisplayName = "Sun Location (world space)"))
+	FVector m_SunLocation;
+
+>>>>>>> refs/remotes/origin/master
 	// Whether or not to move and rotate the body
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true", DisplayName = "Move Body"))
 	bool m_bMoveBody;
@@ -281,6 +292,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Scale")
 	const float& GetOrbitDistanceScale() const { return this->m_OrbitDistanceScale; }
 
+<<<<<<< HEAD
+=======
+	UFUNCTION(BlueprintPure, Category = "World")
+	const FVector& GetSunLocation() const { return this->m_SunLocation; }
+
+>>>>>>> refs/remotes/origin/master
 	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetMinVelocity(const float& velocity) { this->m_MinSpeed = velocity; }
 
@@ -335,6 +352,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetOrbitDistanceScale(const float& scale) { this->m_OrbitDistanceScale = scale; }
 
+<<<<<<< HEAD
+=======
+	UFUNCTION(BlueprintCallable, Category = "Scale")
+	void SetSunLocation(const FVector& location);
+
+>>>>>>> refs/remotes/origin/master
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void SetMoveBody(const bool& move)
 	{
