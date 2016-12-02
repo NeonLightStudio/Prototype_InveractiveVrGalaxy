@@ -48,3 +48,9 @@ void ADomeControl::Transparent()
 	this->m_Dome->SetDomeState(EDomeState::Transparent);
 }
 
+void ADomeControl::Opaque()
+{
+	this->m_Dome->SetDomeState(EDomeState::Open);
+	this->m_Dome->SetDomeState(EDomeState::Close);
+}
+
