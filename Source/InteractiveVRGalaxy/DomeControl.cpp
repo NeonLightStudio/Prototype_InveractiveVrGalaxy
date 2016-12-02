@@ -41,3 +41,10 @@ void ADomeControl::NextDomeState()
 		this->m_Dome->SetDomeState(EDomeState::Open);
 	}
 }
+
+void ADomeControl::Transparent()
+{
+
+	this->m_Dome->SetDomeState(EDomeState::Transparent);
+}
+

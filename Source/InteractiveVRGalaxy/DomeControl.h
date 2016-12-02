@@ -22,6 +22,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Dome")
 	void NextDomeState();
+	UFUNCTION(BlueprintCallable, Category = "Dome")
+	void Transparent();
 
 private:
 
