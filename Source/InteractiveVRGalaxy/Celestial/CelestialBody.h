@@ -54,9 +54,9 @@ public:
 	void SetDrawAtmosphere(const bool& enable);
 
 	// Move this body along its orbit. Requires the center, speed multiplier, and orbit distance scale
-	void Move(const ACelestialBody *center, const float& multiplier, const float& distanceScale);
+	void Move(const ACelestialBody *center, const float& timeScale, const float& distanceScale, const float& delta);
 
-	FORCEINLINE USceneComponent* GetRootComponent() const { return this->m_Root; }
+	FORCEINLINE UStaticMeshComponent* GetRootComponent() const { return this->m_Root; }
 
 	FORCEINLINE const TArray<TSubclassOf<ACelestialBody>>& GetSatellites() const { return this->m_Satellites; }
 
@@ -214,6 +214,18 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Characteristics", meta = (AllowPrivateAccess = "true", DisplayName = "Rotate Clockwise (planet)"))
 	bool m_RotatePlanetClockwise;
 
+	// Whether or not to move and rotate the body
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true", DisplayName = "Move Body"))
+	bool m_bMoveBody;
+	bool m_bMoveBodyTransition; // should be true if the body is in transition mode
+
+	// Time taken for the body to return to its proper position after MoveBody is toggled (seconds)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true", DisplayName = "Transition Delay (seconds)"))
+	float m_TransitionDelay;
+	float m_TransitionTimer;
+	FVector m_TransitionPosStart;
+	FRotator m_TransitionRotStart;
+
 public:
 	UFUNCTION(BlueprintPure, Category = "Atmosphere")
 	AAtmosphere* GetAtmosphere() const { return this->m_Atmosphere; }
@@ -269,59 +281,72 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Scale")
 	const float& GetOrbitDistanceScale() const { return this->m_OrbitDistanceScale; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetMinVelocity(const float& velocity) { this->m_MinSpeed = velocity; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetMaxVelocity(const float& velocity) { this->m_MaxSpeed = velocity; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetFurthestDistance(const float& km) { this->m_FurthestDistance = km; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetNearestDistance(const float& km) { this->m_NearestDistance = km; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetSemiMajorAxis(const float& km) { this->m_SemiMajorAxis = km; this->CalculateSemiMinorAxis(); this->CalculatePerimeter(); }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetEccentricity(const float& eccentricity) { this->m_Eccentricity = eccentricity; this->CalculateSemiMinorAxis(); this->CalculatePerimeter(); }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetOrbitPeriod(const float& days) { this->m_OrbitPeriod = days; }
 
-	UFUNCTION(BlueprintPure, Category = "Orbit")
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetRotateOrbitClockwise(const bool& clockwise) { this->m_RotateOrbitClockwise = clockwise; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetGravity(const float& ms) { this->m_Gravity = ms; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetMass(const float& kg24) { this->m_Mass = kg24; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetRadius(const float& km) { this->m_Radius = km; this->SetScale(this->m_LastRadiusScale); }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetAxialTilt(const float& degrees) { this->m_AxialTilt = degrees; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetRotationPeriod(const float& seconds) { this->m_RotationPeriod = seconds; }
 
-	UFUNCTION(BlueprintPure, Category = "Characteristics")
+	UFUNCTION(BlueprintCallable, Category = "Characteristics")
 	void SetRotatePlanetClockwise(const bool& clockwise) { this->m_RotatePlanetClockwise = clockwise; }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetVelocityScale(const float& scale) { this->m_VelocityScale = scale; }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetRotationScale(const float& scale) { this->m_RotationScale = scale; }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetRadiusScale(const float& scale) { this->m_RadiusScale = scale; this->SetScale(this->m_LastRadiusScale); }
 
-	UFUNCTION(BlueprintPure, Category = "Scale")
+	UFUNCTION(BlueprintCallable, Category = "Scale")
 	void SetOrbitDistanceScale(const float& scale) { this->m_OrbitDistanceScale = scale; }
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void SetMoveBody(const bool& move)
+	{
+		this->m_bMoveBody = move; 
+		this->m_bMoveBodyTransition = move; 
+		if (move)
+		{
+			this->m_TransitionTimer = 0.0f;
+			this->m_TransitionPosStart = this->m_Root->GetComponentLocation();
+			this->m_TransitionRotStart = this->m_Root->GetComponentRotation();
+		}
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Time")
 	static float CalculateTimeToSeconds(const float& days, const float& hours, const float& minutes, const float& seconds)

@@ -31,8 +31,17 @@ ACelestialBody::ACelestialBody() : m_Material(nullptr), m_Atmosphere(nullptr), m
 	this->m_RadiusScale = 1.0f;
 	this->m_OrbitDistanceScale = 1.0f;
 
+	// Movement
+	this->m_bMoveBody = true;
+	this->m_bMoveBodyTransition = false;
+	this->m_TransitionDelay = 1.0f;
+
 	// Other
 	this->m_Root = UObject::CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyRoot"));
+	if(this->m_Material)
+	{
+		this->m_Root->SetMaterial(0, this->m_Material);
+	}
 	Super::RootComponent = this->m_Root;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> sphere(SPHERE_MESH_LOCATION);
@@ -56,10 +65,6 @@ void ACelestialBody::BeginPlay()
 	{
 		this->m_bDrawAtmosphere = false;
 		this->SetDrawAtmosphere(true);
-	}
-	if (this->m_Material)
-	{
-		this->m_Root->SetMaterial(0, this->m_Material);
 	}
 	this->m_Root->SetRelativeRotation(FQuat(FVector(0.0f, 1.0f, 0.0f), -this->m_AxialTilt * DEG_TO_RAD));
 }
@@ -112,6 +117,10 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 	{
 		this->SetDrawOrbit(false);
 		this->SetDrawOrbit(true);
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_bMoveBody))
+	{
+		this->SetMoveBody(this->m_bMoveBody);
 	}
 	
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -284,7 +293,7 @@ void ACelestialBody::SetDrawOrbit(const bool& draw)
 //	}
 //}
 
-void ACelestialBody::Move(const ACelestialBody *center, const float& multiplier, const float& distanceScale)
+void ACelestialBody::Move(const ACelestialBody *center, const float& timeScale, const float& distanceScale, const float& delta)
 {
 	check(this->m_Root);
 	float velocity = this->CalculateVelocity(this->GetAngleToCenter() * DEG_TO_RAD);
@@ -305,12 +314,31 @@ void ACelestialBody::Move(const ACelestialBody *center, const float& multiplier,
 	this->m_LastOffset = offset;
 	this->m_LastDistanceScale = distanceScale;
 
-	this->m_Angle += (velocity * distanceScale * this->m_OrbitDistanceScale * multiplier / kmPerDegree);
+	this->m_Angle += (velocity * distanceScale * this->m_OrbitDistanceScale * timeScale * delta / kmPerDegree);
 	this->m_Angle = FMath::Fmod(this->m_Angle, 360.0f);
-	this->m_Root->SetWorldLocation(this->CalculatePosition(this->m_Angle * DEG_TO_RAD, offset, distanceScale));
-	//this->m_Root->SetRelativeLocation(this->CalculatePosition(this->m_Angle * DEG_TO_RAD, distanceOffset, distanceScale));
 
-	FRotator rotator(0.0f, this->CalculateRotation(this->m_Angle * DEG_TO_RAD) * RAD_TO_DEG, 0.0f);
-	this->m_PlanetRotation = rotator.Yaw;
-	this->m_Root->SetRelativeRotation(rotator);
+	this->m_PlanetRotation = this->CalculateRotation(this->m_Angle * DEG_TO_RAD) * RAD_TO_DEG;
+
+	if(this->m_bMoveBody)
+	{
+		FVector targetPosition = this->CalculatePosition(this->m_Angle * DEG_TO_RAD, offset, distanceScale);
+		FRotator targetRotation = FRotator(0.0f, this->m_PlanetRotation, 0.0f);
+		if(this->m_bMoveBodyTransition)
+		{
+			this->m_TransitionTimer += delta;
+			if(this->m_TransitionTimer >= this->m_TransitionDelay)
+			{
+				this->m_bMoveBodyTransition = false;
+				this->m_TransitionTimer = this->m_TransitionDelay;
+			}
+			float perc = FMath::Sin(this->m_TransitionTimer / this->m_TransitionDelay * PI / 2.0f);
+			this->m_Root->SetWorldLocation(FMath::Lerp(this->m_TransitionPosStart, targetPosition, perc));
+			this->m_Root->SetRelativeRotation(FMath::Lerp(this->m_TransitionRotStart, targetRotation, perc));
+		}
+		else
+		{
+			this->m_Root->SetRelativeRotation(targetRotation);
+			this->m_Root->SetWorldLocation(targetPosition);
+		}
+	}
 }

@@ -46,6 +46,15 @@ void ASolarSystem::SpawnBodies(AActor *parent, const TArray<TSubclassOf<ACelesti
 		actor->AttachToActor(parent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		this->m_AttachedBodies.Add(actor);
 
+		UStaticMeshComponent *root = actor->GetRootComponent();
+		UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(root->GetMaterial(0), actor);
+		if (material != nullptr)
+		{
+			material->SetVectorParameterValue(FName("Sun Location"), Super::GetActorLocation());
+
+			root->SetMaterial(0, material);
+		}
+
 		const TArray<TSubclassOf<ACelestialBody>>& satellites = actor->GetSatellites();
 		if (satellites.Num() > 0)
 		{
@@ -89,8 +98,7 @@ void ASolarSystem::Tick(float delta)
 		// Center actor does not move so there's no point calling the method
 		if (actor != this->m_CenterActor)
 		{
-			float multiplier = this->m_TimeScale * delta;
-			body->Move(this->m_CenterActor, multiplier, this->m_OrbitDistanceScale);
+			body->Move(this->m_CenterActor, this->m_TimeScale, this->m_OrbitDistanceScale, delta);
 		}
 	}
 	if (this->bScaleUpdateRequired)

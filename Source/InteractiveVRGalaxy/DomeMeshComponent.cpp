@@ -22,56 +22,7 @@ UDomeMeshComponent::UDomeMeshComponent()
 void UDomeMeshComponent::BeginPlay()
 {
 	this->CreateDome();
-	//this->SetOpaque();
 }
-
-//void UDomeMeshComponent::SetOpaque()
-//{
-//	if (Super::GetNumSections() == 0)
-//	{
-//		return;
-//	}
-//	check(this->m_MaterialOpaque);
-//	UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(this->m_MaterialOpaque, this);
-//	for (int i = 0; i < Super::GetNumSections(); i++)
-//	{
-//		Super::SetMaterial(i, material);
-//	}
-//}
-//
-//void UDomeMeshComponent::SetTransparent()
-//{
-//	if (Super::GetNumSections() == 0)
-//	{
-//		return;
-//	}
-//	check(this->m_MaterialTransparent);
-//	for (int i = 0; i < Super::GetNumSections(); i++)
-//	{
-//		UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(this->m_MaterialTransparent, this);
-//		material->SetScalarParameterValue(FName("BlendDuration"), FMath::RandRange(0.4f, 1.8f));
-//		material->SetScalarParameterValue(FName("StartTime"), UGameplayStatics::GetRealTimeSeconds(this));
-//		material->SetScalarParameterValue(FName("TimeOffset"), FMath::RandRange(0.0f, 0.8f));
-//		material->SetScalarParameterValue(FName("DisplaceDelay"), 2.0f);
-//		//material->SetScalarParameterValue(FName("TimeOffset"), UGameplayStatics::GetRealTimeSeconds(this) + (i / (float)Super::GetNumSections()) * 2);//+ FMath::RandRange(0.0f, 2.0f));
-//		Super::SetMaterial(i, material);
-//	}
-//}
-
-/*
-#if WITH_EDITOR
-void UDomeMeshComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	FName name = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-
-	if (name == GET_MEMBER_NAME_CHECKED(UDomeMeshComponent, m_VerticalSegments)
-		|| name == GET_MEMBER_NAME_CHECKED(UDomeMeshComponent, m_HorizontalSegments))
-	{
-		this->CreateDome();
-	}
-}
-#endif
-*/
 
 void UDomeMeshComponent::CreateDome()
 {
@@ -130,5 +81,5 @@ void UDomeMeshComponent::CreateDome()
 			Super::CreateMeshSection(count++, vertices, indices, normals, uv, TArray<FColor>(), TArray<FProcMeshTangent>(), DOME_COLLISION);
 		}
 	}
-	UE_LOG(LogClass, Log, TEXT("Section Counter: %d"), Super::GetNumSections());
+	//UE_LOG(LogClass, Log, TEXT("Section Counter: %d"), Super::GetNumSections());
 }
