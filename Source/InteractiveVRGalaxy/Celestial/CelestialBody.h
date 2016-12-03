@@ -47,6 +47,10 @@ public:
 	// Calculate the position of the body using the orbit angle, distance offset, and distance scale
 	FVector CalculatePosition(const float& radians, const float& offset, const float& distanceScale) const;
 
+	// If this body has an orbit actor, disable and enable it again. (should be called if something makes the orbit no longer accurate)
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
+	void ResetDrawOrbit();
+
 	// Whether or not to draw the orbit of this body
 	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void SetDrawOrbit(const bool& draw);

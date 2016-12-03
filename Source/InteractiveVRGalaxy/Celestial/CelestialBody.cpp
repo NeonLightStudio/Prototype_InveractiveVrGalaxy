@@ -91,6 +91,10 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 	{
 		this->CalculateSemiMinorAxis();
 		this->CalculatePerimeter();
+		if(this->m_bDrawOrbit)
+		{
+			this->ResetDrawOrbit();
+		}
 	}
 	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_Material))
 	{
@@ -170,6 +174,10 @@ void ACelestialBody::SetScale(const float& scale)
 	{
 		this->m_Atmosphere->UpdateAtmosphere();
 	}
+	if(this->m_bDrawOrbit)
+	{
+		this->ResetDrawOrbit();
+	}
 }
 
 float ACelestialBody::CalculateRotation(const float& radians) const
@@ -202,35 +210,12 @@ FVector ACelestialBody::CalculatePosition(const float& radians, const float& off
 	return Super::GetAttachParentActor()->GetActorLocation() + vector;
 }
 
-void ACelestialBody::SetDrawAtmosphere(const bool& draw)
+void ACelestialBody::ResetDrawOrbit()
 {
-	if(this->m_bDrawAtmosphere == draw)
+	if(this->m_bDrawOrbit)
 	{
-		return;
-	}
-	this->m_bDrawAtmosphere = draw;
-	if(Super::GetWorld() == nullptr)
-	{
-		return;
-	}
-	if(!draw)
-	{
-		if(this->m_Atmosphere != nullptr)
-		{
-			this->m_Atmosphere->Destroy();
-			this->m_Atmosphere = nullptr;
-		}
-	}
-	else
-	{
-		this->m_Atmosphere = (AAtmosphere*)Super::GetWorld()->SpawnActor(AAtmosphere::StaticClass());
-		if(this->m_Atmosphere)
-		{
-			this->m_Atmosphere->SetAtmosphereData(&this->m_AtmosphereData);
-			this->m_Atmosphere->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-
-			this->m_Atmosphere->UpdateAtmosphere();
-		}
+		this->SetDrawOrbit(false); //destroy the current orbit actor
+		this->SetDrawOrbit(true);  //create a new orbit actor
 	}
 }
 
@@ -247,6 +232,7 @@ void ACelestialBody::SetDrawOrbit(const bool& draw)
 	}
 	if (!draw)
 	{
+		// If we no longer want to see the orbit, destroy the actor
 		if (this->m_Orbit != nullptr)
 		{
 			this->m_Orbit->Destroy();
@@ -255,15 +241,19 @@ void ACelestialBody::SetDrawOrbit(const bool& draw)
 	}
 	else
 	{
+		// Check to see if we have a parent actor to attach the orbit to (we can't attach to ourselves due to relative positioning)
 		AActor *parent = Super::GetAttachParentActor();
 		if(parent == nullptr)
 		{
+			// If we have no parent, we cannot create the orbit actor
 			this->m_bDrawOrbit = false;
 			return;
 		}
+		// Create the orbit actor
 		this->m_Orbit = (AOrbit*)Super::GetWorld()->SpawnActor(AOrbit::StaticClass());
 		if (this->m_Orbit)
 		{
+			// Set the points of the orbit accoding to the preset resolution
 			TArray<FVector> points;
 			for (int i = 0; i < this->m_DrawOrbitResolution; i++)
 			{	
@@ -275,56 +265,45 @@ void ACelestialBody::SetDrawOrbit(const bool& draw)
 			this->m_Orbit->SetRadius(this->m_DrawOrbitRadius);
 			this->m_Orbit->AttachToActor(parent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+			// Update the material parameters to match what we just sent in
 			this->m_Orbit->UpdateOrbit();
 		}
 	}
 }
 
-//void ACelestialBody::SetDrawOrbit(const bool& draw)
-//{
-//	if(this->m_bDrawOrbit == draw || (draw && this->m_ParticleSystem == nullptr))
-//	{
-//		return;
-//	}
-//	this->m_bDrawOrbit = draw;
-//	if (Super::GetWorld() == nullptr)
-//	{
-//		return;
-//	}
-//	if(!draw)
-//	{
-//		for(int i = 0; i < this->m_OrbitParticleSystems.Num(); i++)
-//		{
-//			this->m_OrbitParticleSystems[i]->DestroyComponent();
-//		}
-//		this->m_OrbitParticleSystems.Empty();
-//	}
-//	else
-//	{
-//		check(this->m_OrbitParticleResolution >= 0);
-//
-//		FVector prevLoc = this->m_Root->GetComponentLocation();
-//		for(int i = 0; i < this->m_OrbitParticleResolution; i++)
-//		{
-//			UParticleSystemComponent *system = UGameplayStatics::SpawnEmitterAtLocation(Super::GetWorld(),
-//				this->m_ParticleSystem, this->m_Root->GetComponentLocation(), FRotator::ZeroRotator, false);
-//			if(system == nullptr)
-//			{
-//				continue;
-//			}
-//			float currentRad = PI2 * (i + 1) / this->m_OrbitParticleResolution;
-//			FVector target = this->CalculatePosition(currentRad, this->m_LastOffset, this->m_LastDistanceScale);
-//			system->SetBeamSourcePoint(0, prevLoc, 0);
-//			system->SetBeamTargetPoint(0, prevLoc = target, 0);
-//
-//			system->SetColorParameter(FName("InitialColor"), this->m_OrbitColor);
-//			// Set the scale of the beam to be equal to the bodies scale. Has an additional multiplier to increase or decrease the scale using the bodies as a base.
-//			system->SetWorldScale3D(FVector(ORBIT_BEAM_SCALE_MULTIPLIER * this->GetRadiusWithScale() * 2.0f));
-//
-//			this->m_OrbitParticleSystems.Add(system);
-//		}
-//	}
-//}
+void ACelestialBody::SetDrawAtmosphere(const bool& draw)
+{
+	if (this->m_bDrawAtmosphere == draw)
+	{
+		return;
+	}
+	this->m_bDrawAtmosphere = draw;
+	if (Super::GetWorld() == nullptr)
+	{
+		return;
+	}
+	if (!draw)
+	{
+		// If we don't want the atmosphere anymore, destroy it
+		if (this->m_Atmosphere != nullptr)
+		{
+			this->m_Atmosphere->Destroy();
+			this->m_Atmosphere = nullptr;
+		}
+	}
+	else
+	{
+		// If we want an atmosphere, create it and then set the attributes to be equal to what is set within this class
+		this->m_Atmosphere = (AAtmosphere*)Super::GetWorld()->SpawnActor(AAtmosphere::StaticClass());
+		if (this->m_Atmosphere)
+		{
+			this->m_Atmosphere->SetAtmosphereData(&this->m_AtmosphereData);
+			this->m_Atmosphere->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+			this->m_Atmosphere->UpdateAtmosphere();
+		}
+	}
+}
 
 void ACelestialBody::Move(const ACelestialBody *center, const float& timeScale, const float& distanceScale, const float& delta)
 {
@@ -335,6 +314,7 @@ void ACelestialBody::Move(const ACelestialBody *center, const float& timeScale, 
 	float kmPerDegree = this->m_Perimeter * distanceScale * this->m_OrbitDistanceScale / 360.0f;
 	check(kmPerDegree != 0.0f);
 
+	// Check to see whether we want to offset from the center or the parent actor
 	float offset;
 	if (Super::GetAttachParentActor()->IsA(ACelestialBody::StaticClass()))
 	{
@@ -344,27 +324,39 @@ void ACelestialBody::Move(const ACelestialBody *center, const float& timeScale, 
 	{
 		offset = center->GetRadiusWithScale();
 	}
+	// Check to see if the calling actor has changed the offset or distance scale
+	// If we have an orbit actor on this body then we will need to reset it to keep it accurate
+	bool resetOrbit = this->m_bDrawOrbit && (!FMath::IsNearlyEqual(this->m_LastOffset, offset)
+		|| !FMath::IsNearlyEqual(this->m_LastDistanceScale, distanceScale));
 	this->m_LastOffset = offset;
 	this->m_LastDistanceScale = distanceScale;
+	if (resetOrbit)
+	{
+		// Recreate the orbit with the new offset and scale parameters in mind
+		this->ResetDrawOrbit();
+	}
 
 	this->m_Angle += (velocity * distanceScale * this->m_OrbitDistanceScale * timeScale * delta / kmPerDegree);
 	this->m_Angle = FMath::Fmod(this->m_Angle, 360.0f);
 
 	this->m_PlanetRotation = this->CalculateRotation(this->m_Angle * DEG_TO_RAD) * RAD_TO_DEG;
 
+	// If we want this body to physically move in the world
 	if(this->m_bMoveBody)
 	{
 		FVector targetPosition = this->CalculatePosition(this->m_Angle * DEG_TO_RAD, offset, distanceScale);
 		FRotator targetRotation = FRotator(0.0f, this->m_PlanetRotation, 0.0f);
+		// Check to see if we need to transition back into the orbit, or if we are already in the orbit
 		if(this->m_bMoveBodyTransition)
 		{
+			// If we need to transition, linear interpolate from the current position back to the orbit position over a delay
 			this->m_TransitionTimer += delta;
 			if(this->m_TransitionTimer >= this->m_TransitionDelay)
 			{
 				this->m_bMoveBodyTransition = false;
 				this->m_TransitionTimer = this->m_TransitionDelay;
 			}
-			float perc = FMath::Sin(this->m_TransitionTimer / this->m_TransitionDelay * PI / 2.0f);
+			float perc = FMath::Sin(this->m_TransitionTimer / this->m_TransitionDelay * PI / 2.0f); // use sine for a smoother transition
 			this->m_Root->SetWorldLocation(FMath::Lerp(this->m_TransitionPosStart, targetPosition, perc));
 			this->m_Root->SetRelativeRotation(FMath::Lerp(this->m_TransitionRotStart, targetRotation, perc));
 		}
