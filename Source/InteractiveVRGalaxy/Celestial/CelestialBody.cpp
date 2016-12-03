@@ -36,12 +36,9 @@ ACelestialBody::ACelestialBody() : m_Material(nullptr), m_MaterialDynamic(nullpt
 	this->m_bMoveBodyTransition = false;
 	this->m_TransitionDelay = 1.0f;
 
-<<<<<<< HEAD
-=======
 	// World
 	this->m_SunLocation = FVector(0.0f);
 
->>>>>>> refs/remotes/origin/master
 	// Other
 	this->m_Root = UObject::CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyRoot"));
 	if(this->m_Material)
@@ -138,15 +135,12 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 	{
 		this->SetMoveBody(this->m_bMoveBody);
 	}
-<<<<<<< HEAD
-	
-=======
+
 	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_SunLocation))
 	{
 		this->SetSunLocation(this->m_SunLocation);
 	}
 
->>>>>>> refs/remotes/origin/master
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
