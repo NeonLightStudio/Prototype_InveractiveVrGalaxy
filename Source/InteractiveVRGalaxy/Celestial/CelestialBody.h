@@ -84,6 +84,9 @@ private:
 		this->m_Perimeter = PI * (this->m_SemiMajorAxis + this->m_SemiMinorAxis) * (1.0f + (3.0f * h) / (10.0f + FMath::Sqrt(4 - 3.0f * h)));
 	}
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true", DisplayName = "Mesh"))
+	UStaticMesh *m_Mesh;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true", DisplayName = "Root"))
 	UStaticMeshComponent *m_Root;
 
