@@ -9,7 +9,7 @@
 #define SPHERE_MESH_LOCATION TEXT("StaticMesh'/Game/VirtualRealityBP/Blueprints/Planets/SphereMesh.SphereMesh'")
 
 // Sets default values
-ACelestialBody::ACelestialBody() : m_Material(nullptr), m_MaterialDynamic(nullptr), m_Atmosphere(nullptr), m_Orbit(nullptr)
+ACelestialBody::ACelestialBody() : m_Mesh(nullptr), m_Material(nullptr), m_MaterialDynamic(nullptr), m_Atmosphere(nullptr), m_Orbit(nullptr)
 {
 	// Atmosphere
 	this->m_bDrawAtmosphere = false;
@@ -50,7 +50,7 @@ ACelestialBody::ACelestialBody() : m_Material(nullptr), m_MaterialDynamic(nullpt
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> sphere(SPHERE_MESH_LOCATION);
 	if (sphere.Succeeded())
 	{
-		this->m_Root->SetStaticMesh(sphere.Object);
+		this->m_Root->SetStaticMesh(this->m_Mesh = sphere.Object);
 	}
 }
 
@@ -143,6 +143,11 @@ void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_SunLocation))
 	{
 		this->SetSunLocation(this->m_SunLocation);
+	}
+
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_Mesh))
+	{
+		this->m_Root->SetStaticMesh(this->m_Mesh);
 	}
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);
