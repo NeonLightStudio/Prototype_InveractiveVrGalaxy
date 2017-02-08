@@ -3,7 +3,7 @@
 #include "InteractiveVRGalaxy.h"
 #include "DomeMeshComponent.h"
 
-#define DOME_COLLISION false
+#define DOME_COLLISION true
 
 #define DOME_VERTICAL_SEGMENTS 30	//default
 #define DOME_HORIZONTAL_SEGMENTS 20 //default
