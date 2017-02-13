@@ -21,7 +21,9 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Dome")
-	void NextDomeState();
+	void OpenDome();
+	UFUNCTION( BlueprintCallable, Category = "Dome" )
+	void CloseDome();
 	UFUNCTION(BlueprintCallable, Category = "Dome")
 	void Transparent();
 	UFUNCTION(BlueprintCallable, Category = "Dome")

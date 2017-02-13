@@ -26,20 +26,23 @@ void ADomeControl::Tick( float DeltaTime )
 
 }
 
-void ADomeControl::NextDomeState()
+void ADomeControl::OpenDome()
 {
-	if (this->m_Dome == nullptr)
+	if( this->m_Dome == nullptr )
 	{
 		return;
 	}
-	if (this->m_Dome->GetDomeState() == EDomeState::Open)
+	this->m_Dome->SetDomeState( EDomeState::Open );
+}
+
+void ADomeControl::CloseDome()
+{
+	if( this->m_Dome == nullptr )
 	{
-		this->m_Dome->SetDomeState(EDomeState::Close);
+		return;
 	}
-	else
-	{
-		this->m_Dome->SetDomeState(EDomeState::Open);
-	}
+
+	this->m_Dome->SetDomeState( EDomeState::Close );
 }
 
 void ADomeControl::Transparent()
@@ -50,7 +53,6 @@ void ADomeControl::Transparent()
 
 void ADomeControl::Opaque()
 {
-	this->m_Dome->SetDomeState(EDomeState::Open);
-	this->m_Dome->SetDomeState(EDomeState::Close);
+	this->m_Dome->SetDomeState(EDomeState::Opaque );
 }
 

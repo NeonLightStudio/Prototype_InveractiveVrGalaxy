@@ -12,6 +12,7 @@ enum EDomeState
 	Undefined,	// The dome has no state
 	Open,		// The dome is completely transparent
 	Transparent,// The dome panels go transparent without fully disappearing
+	Opaque,// The dome panels go transparent without fully disappearing
 	Close		// The dome is completely opaque
 };
 

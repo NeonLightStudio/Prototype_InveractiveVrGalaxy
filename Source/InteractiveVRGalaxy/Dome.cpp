@@ -153,6 +153,12 @@ void ADome::Tick(float delta)
 				color = 0.0f;
 				displace = 0.0f;
 			}
+			if( this->m_NextDomeState == EDomeState::Opaque)
+			{
+				color = 1.0f;
+				displace = 0.0f;
+				fade = -1.0f;
+			}
 
 			material->SetScalarParameterValue(SCALAR_COLOR_MULTIPLIER, color);
 			material->SetScalarParameterValue(SCALAR_DISPLACE_PERCENTAGE, displace);
