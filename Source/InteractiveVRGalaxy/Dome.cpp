@@ -24,30 +24,24 @@
 #define SCALAR_ANIMATION_COLOR_BLEND_DURATION FName("Color Blend Duration")
 #define SCALAR_ANIMATION_DISPLACE_DURATION FName("Displace Duration")
 
-//#define SCALAR_OPEN FName("Open")
-//#define SCALAR_TIME FName("Time")
-//#define SCALAR_ANIMATION_DURATION				FName("Animation Duration")
-//#define SCALAR_ANIMATION_START_DELAY			FName("Animation Start Delay")
-//#define SCALAR_ANIMATION_COLOR_BLEND_DURATION	FName("Color Blend Duration")
-//#define SCALAR_ANIMATION_DISPLACE_DURATION		FName("Displace Duration")
-//#define SCALAR_ANIMATION_DISPLACE_OFFSET		FName("Displace Offset")
-
-#define DOME_MATERIAL_LOCATION "Material'/Game/VirtualRealityBP/Materials/M_DomeMaterial.M_DomeMaterial'"
+#define DOME_MATERIAL_LOCATION TEXT("Material'/Game/VirtualRealityBP/Materials/M_DomeMaterial.M_DomeMaterial'")
 
 // Sets default values
-ADome::ADome() : m_MaterialInstance(nullptr), m_DomeState(EDomeState::Close), m_NextDomeState(EDomeState::Undefined)
+ADome::ADome() : m_MaterialInstance(nullptr), m_NextDomeState(EDomeState::Undefined), m_DomeState(EDomeState::Close)
 {
+	// Let the dome tick so that we can control the animation
+	Super::PrimaryActorTick.bCanEverTick = true;
+
 	// Set the mesh of this component to the Dome Mesh
 	this->m_Mesh = UObject::CreateDefaultSubobject<UDomeMeshComponent>(TEXT("DomeMesh"));
 	Super::RootComponent = this->m_Mesh;
 
 	// Find our Dome Material
-	static ConstructorHelpers::FObjectFinder<UMaterial> material(TEXT(DOME_MATERIAL_LOCATION));
-	check(material.Succeeded());
-	this->m_Material = material.Object;
-
-	// Let the dome tick so that we can control the animation
-	Super::PrimaryActorTick.bCanEverTick = true;
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> Material(DOME_MATERIAL_LOCATION);
+	if (Material.Succeeded())
+	{
+		this->m_Material = Material.Object;
+	}
 }
 
 ADome::~ADome()
@@ -93,16 +87,6 @@ void ADome::BeginPlay()
 		material->SetScalarParameterValue(SCALAR_ANIMATION_START_DELAY, ANIMATION_START_DELAY);
 		material->SetScalarParameterValue(SCALAR_ANIMATION_COLOR_BLEND_DURATION, ANIMATION_COLOR_BLEND_DURATION);
 		material->SetScalarParameterValue(SCALAR_ANIMATION_DISPLACE_DURATION, ANIMATION_DISPLACE_DURATION);
-
-		//material->SetScalarParameterValue(SCALAR_OPEN, ANIMATION_CLOSE);
-		//material->SetScalarParameterValue(SCALAR_ANIMATION_DURATION, ANIMATION_DURATION);
-		//material->SetScalarParameterValue(SCALAR_ANIMATION_START_DELAY, ANIMATION_START_DELAY);
-		//material->SetScalarParameterValue(SCALAR_ANIMATION_COLOR_BLEND_DURATION, ANIMATION_COLOR_BLEND_DURATION);
-		//material->SetScalarParameterValue(SCALAR_ANIMATION_DISPLACE_DURATION, ANIMATION_DISPLACE_DURATION);
-		//material->SetScalarParameterValue(SCALAR_ANIMATION_DISPLACE_OFFSET, ANIMATION_DISPLACE_OFFSET);
-
-		//// Set the time which our animation started to a time where it should already be finished
-		//material->SetScalarParameterValue(SCALAR_TIME, this->m_DomeStateTime); 
 
 		this->m_Mesh->SetMaterial(i, material);
 		this->m_MaterialInstance[i] = material;
@@ -153,41 +137,24 @@ void ADome::Tick(float delta)
 				color = 0.0f;
 				displace = 0.0f;
 			}
-			
-			if( this->m_NextDomeState == EDomeState::Opaque)
-			{
-				color = 1.0f;
-				displace = 0.0f;
-				fade = FMath::Clamp((time - startDelay) / colorDuration, 1.0f, 0.0f);
-			}
 
 			material->SetScalarParameterValue(SCALAR_COLOR_MULTIPLIER, color);
 			material->SetScalarParameterValue(SCALAR_DISPLACE_PERCENTAGE, displace);
 			material->SetScalarParameterValue(SCALAR_FADE_PERCENTAGE, fade);
 		}
 	}
-
-
-	//if (this->m_NextDomeState != this->m_DomeState
-	//	&& this->m_NextDomeState != EDomeState::Undefined)
-	//{
-		//float time = UGameplayStatics::GetRealTimeSeconds(this);
-		//float timeOffset = (this->m_DomeStateTime + ANIMATION_DURATION) - time;
-
-		//if (timeOffset > 0.0f && timeOffset < ANIMATION_DURATION)
-		//{
-		//	time -= timeOffset;
-		//}
-		//check(this->m_MaterialInstance);
-		//for (int i = 0; i < this->m_Mesh->GetNumSections(); i++)
-		//{
-		//	UMaterialInstanceDynamic *material = this->m_MaterialInstance[i];
-		//	check(material);
-		//	material->SetScalarParameterValue(SCALAR_OPEN, this->m_NextDomeState == EDomeState::Open ? ANIMATION_OPEN : ANIMATION_CLOSE);
-		//	material->SetScalarParameterValue(SCALAR_TIME, time);
-		//}
-		//this->m_DomeStateTime = time;
-		//this->m_DomeState = this->m_NextDomeState;
-		//this->m_NextDomeState = EDomeState::Undefined;
-	//}
 }
+
+#if WITH_EDITOR
+void ADome::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	FName name = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+
+	if (name == GET_MEMBER_NAME_CHECKED(ADome, m_NextDomeState))
+	{
+		this->SetDomeState(this->m_NextDomeState);
+	}
+}
+#endif
