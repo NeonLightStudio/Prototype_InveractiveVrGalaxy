@@ -7,12 +7,11 @@
 #include "Dome.generated.h"
 
 UENUM(BlueprintType)
-enum EDomeState
+enum class EDomeState : uint8
 {
 	Undefined,	// The dome has no state
 	Open,		// The dome is completely transparent
 	Transparent,// The dome panels go transparent without fully disappearing
-	Opaque,// The dome panels go transparent without fully disappearing
 	Close		// The dome is completely opaque
 };
 
@@ -40,19 +39,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "State")
 	const EDomeState& GetDomeState() const { return this->m_DomeState; }
 
-private:
-	UPROPERTY()
-	UMaterial *m_Material;
-	UMaterialInstanceDynamic **m_MaterialInstance;
+#if WITH_EDITOR
+	void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", DisplayName = "Mesh"))
 	class UDomeMeshComponent *m_Mesh;
 
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material", meta = (AllowPrivateAccess = "true", DisplayName = "Material"))
+	UMaterialInterface *m_Material;
+
+	UMaterialInstanceDynamic **m_MaterialInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", meta = (AllowPrivateAccess = "true", DisplayName = "Next Dome State"))
+	EDomeState m_NextDomeState;
+
+	EDomeState m_DomeState;
 	float m_DomeTimer;
 	bool m_bTransparentClose;
-
-	//float m_DomeStateTime;
-	//bool m_DomeStateComplete;
-
-	EDomeState m_DomeState, m_NextDomeState;
 };
