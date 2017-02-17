@@ -18,7 +18,10 @@ void ASolarSystem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	check(Super::GetWorld());
+	if(Super::GetWorld() == nullptr)
+	{
+		return;
+	}
 	this->SpawnBodies(this, this->m_CelestialBodies);
 
 	AActor *center = Super::GetWorld()->SpawnActor(this->m_Center);

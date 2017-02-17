@@ -15,10 +15,11 @@ AOrbit::AOrbit() : m_Material(nullptr), m_Color(FLinearColor::White), m_Mesh(nul
 	this->m_Mesh = UObject::CreateDefaultSubobject<UOrbitMeshComponent>(TEXT("OrbitMesh"));
 	Super::RootComponent = this->m_Mesh;
 
-	static ConstructorHelpers::FObjectFinder<UMaterial> material(TEXT(ORBIT_MATERIAL_LOCATION));
-	check(material.Succeeded());
-	this->m_Material = material.Object;
-
+	static ConstructorHelpers::FObjectFinder<UMaterial> Material(TEXT(ORBIT_MATERIAL_LOCATION));
+	if(Material.Succeeded())
+	{
+		this->m_Material = Material.Object;
+	}
 	Super::PrimaryActorTick.bCanEverTick = true;
 }
 
