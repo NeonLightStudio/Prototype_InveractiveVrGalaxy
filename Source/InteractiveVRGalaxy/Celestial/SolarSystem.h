@@ -16,6 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	ASolarSystem();
 
+	virtual void BeginDestroy() override;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
