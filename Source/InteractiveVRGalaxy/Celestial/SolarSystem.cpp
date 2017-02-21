@@ -13,21 +13,6 @@ ASolarSystem::ASolarSystem() : m_TimeScale(1.0f), m_RadiusScale(1.0f), m_OrbitDi
 	Super::PrimaryActorTick.bCanEverTick = true;
 }
 
-void ASolarSystem::BeginDestroy()
-{
-	Super::BeginDestroy();
-
-	for(AActor *next : this->m_AttachedBodies)
-	{
-		if(next == nullptr)
-		{
-			continue;
-		}
-		next->Destroy();
-	}
-	this->m_AttachedBodies.Empty();
-}
-
 // Called when the game starts or when spawned
 void ASolarSystem::BeginPlay()
 {

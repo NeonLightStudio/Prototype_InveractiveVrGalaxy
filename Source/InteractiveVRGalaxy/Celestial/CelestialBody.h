@@ -26,8 +26,6 @@ protected:
 	ACelestialBody();
 
 public:
-	virtual void BeginDestroy() override;
-
 	virtual void BeginPlay() override;
 
 #if WITH_EDITOR

@@ -15,4 +15,14 @@ class INTERACTIVEVRGALAXY_API AGalaxyGameMode : public AGameMode
 	
 public:
 	AGalaxyGameMode();
+
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
+	void SpawnOrbit(const FVector& location);
+
+	UFUNCTION(BlueprintCallable, Category = "Orbit")
+	void DespawnOrbit();
+
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orbit", meta = (AllowPrivateAccess = "true", DisplayName = "Orbit Class"))
+	TSubclassOf<class ASolarSystem> m_OrbitClass;
 };

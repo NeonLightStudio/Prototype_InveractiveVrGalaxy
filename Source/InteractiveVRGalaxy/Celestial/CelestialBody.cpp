@@ -54,22 +54,6 @@ ACelestialBody::ACelestialBody() : m_Mesh(nullptr), m_Material(nullptr), m_Mater
 	}
 }
 
-void ACelestialBody::BeginDestroy()
-{
-	Super::BeginDestroy();
-
-	TArray<AActor*> actors;
-	Super::GetAttachedActors(actors);
-	for(AActor *next : actors)
-	{
-		if(next == nullptr)
-		{
-			continue;
-		}
-		next->Destroy();
-	}
-}
-
 void ACelestialBody::BeginPlay()
 {
 	this->CalculateSemiMinorAxis();
