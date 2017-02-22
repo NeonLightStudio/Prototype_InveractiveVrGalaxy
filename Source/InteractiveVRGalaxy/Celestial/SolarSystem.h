@@ -16,8 +16,13 @@ public:
 	// Sets default values for this actor's properties
 	ASolarSystem();
 
+	//virtual void BeginDestroy() override;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void DespawnSystem();
 
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

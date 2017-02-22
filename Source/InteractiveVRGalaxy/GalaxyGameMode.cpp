@@ -27,6 +27,7 @@ void AGalaxyGameMode::DespawnOrbit()
 		{
 			continue;
 		}
+		system->DespawnSystem();
 		system->Destroy();
 	}
 }
