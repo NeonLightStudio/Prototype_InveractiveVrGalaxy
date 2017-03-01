@@ -26,8 +26,6 @@ protected:
 	ACelestialBody();
 
 public:
-	//virtual void BeginDestroy() override;
-
 	virtual void BeginPlay() override;
 
 #if WITH_EDITOR
@@ -62,7 +60,7 @@ public:
 	void SetDrawAtmosphere(const bool& enable);
 
 	// Move this body along its orbit. Requires the center, speed multiplier, and orbit distance scale
-	void Move(const ACelestialBody *center, const float& timeScale, const float& distanceScale, const float& delta);
+	virtual void Move(const ACelestialBody *center, const float& timeScale, const float& distanceScale, const float& delta);
 
 	FORCEINLINE UStaticMeshComponent* GetRootComponent() const { return this->m_Root; }
 
@@ -76,7 +74,7 @@ public:
 
 	FORCEINLINE const float& GetSolarSystemDistanceScale() const { return this->m_LastDistanceScale; }
 
-private:
+protected:
 	FORCEINLINE void CalculateSemiMinorAxis() { this->m_SemiMinorAxis = this->m_SemiMajorAxis * FMath::Sqrt(1.0f - this->m_Eccentricity * this->m_Eccentricity); }
 
 	FORCEINLINE void CalculatePerimeter()
@@ -104,7 +102,7 @@ private:
 	// Parameters stored within the solar system are cached here. May not be latest value and can be changed without notice.
 	float m_LastOffset, m_LastRadiusScale, m_LastDistanceScale;
 
-private:
+protected:
 	// Whether or not to have an atmosphere
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Atmosphere", meta = (AllowPrivateAccess = "true", DisplayName = "Enable Atmosphere"))
 	bool m_bDrawAtmosphere;

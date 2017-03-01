@@ -17,10 +17,10 @@ public:
 	AGalaxyGameMode();
 
 	UFUNCTION(BlueprintCallable, Category = "Orbit")
-	void SpawnOrbit(const FVector& location);
+	void SpawnOrbit(const FVector& location) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Orbit")
-	void DespawnOrbit();
+	void DespawnOrbit() const;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orbit", meta = (AllowPrivateAccess = "true", DisplayName = "Orbit Class"))

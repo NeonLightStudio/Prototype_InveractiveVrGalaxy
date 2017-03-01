@@ -13,12 +13,12 @@ AGalaxyGameMode::AGalaxyGameMode()
 	Super::DefaultPawnClass = Pawn.Class;
 }
 
-void AGalaxyGameMode::SpawnOrbit(const FVector& location)
+void AGalaxyGameMode::SpawnOrbit(const FVector& location) const
 {
 	Super::GetWorld()->SpawnActor<ASolarSystem>(this->m_OrbitClass, location, FRotator(0.0f));
 }
 
-void AGalaxyGameMode::DespawnOrbit()
+void AGalaxyGameMode::DespawnOrbit() const
 {
 	for(TActorIterator<ASolarSystem> itr(Super::GetWorld()); itr; ++itr)
 	{

@@ -4,43 +4,28 @@
 #include "SolarSystem.h"
 
 // Sets default values
-ASolarSystem::ASolarSystem() : m_TimeScale( 1.0f ), m_RadiusScale( 1.0f ), m_OrbitDistanceScale( 1.0f ),
-m_CenterOffset( 0.0f ), m_CenterActor( nullptr ), bScaleUpdateRequired( false )
+ASolarSystem::ASolarSystem() : m_TimeScale(1.0f), m_RadiusScale(1.0f), m_OrbitDistanceScale(1.0f),
+m_CenterOffset(0.0f), m_CenterActor(nullptr), bScaleUpdateRequired(false)
 {
-	this->m_Root = UObject::CreateDefaultSubobject<USceneComponent>( TEXT( "SolarSystemRoot" ) );
+	this->m_Root = UObject::CreateDefaultSubobject<USceneComponent>(TEXT("SolarSystemRoot"));
 	Super::RootComponent = this->m_Root;
 
 	Super::PrimaryActorTick.bCanEverTick = true;
 }
 
-//void ASolarSystem::BeginDestroy()
-//{
-//	Super::BeginDestroy();
-//
-//	for( AActor *next : this->m_AttachedBodies )
-//	{
-//		if( next == nullptr )
-//		{
-//			continue;
-//		}
-//		next->Destroy();
-//	}
-//	this->m_AttachedBodies.Empty();
-//}
-
 void ASolarSystem::DespawnSystem()
 {
 	TArray<AActor*> actors;
-	for( AActor *next : this->m_AttachedBodies )
+	for (AActor *next : this->m_AttachedBodies)
 	{
-		if( next == nullptr )
+		if (next == nullptr)
 		{
 			continue;
 		}
-		next->GetAttachedActors( actors );
-		for( AActor *actor : actors )
+		next->GetAttachedActors(actors);
+		for (AActor *actor : actors)
 		{
-			if( actor == nullptr )
+			if (actor == nullptr)
 			{
 				continue;
 			}
@@ -56,53 +41,53 @@ void ASolarSystem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if( Super::GetWorld() == nullptr )
+	if (Super::GetWorld() == nullptr)
 	{
 		return;
 	}
-	this->SpawnBodies( this, this->m_CelestialBodies );
+	this->SpawnBodies(this, this->m_CelestialBodies);
 
-	AActor *center = Super::GetWorld()->SpawnActor( this->m_Center );
-	if( center )
+	AActor *center = Super::GetWorld()->SpawnActor(this->m_Center);
+	if (center)
 	{
 		this->m_CenterActor = (ACelestialBody*)center;
-		center->AttachToActor( this, FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+		center->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-		this->m_AttachedBodies.Add( this->m_CenterActor );
+		this->m_AttachedBodies.Add(this->m_CenterActor);
 	}
 	this->bScaleUpdateRequired = true;
 }
 
-void ASolarSystem::SpawnBodies( AActor *parent, const TArray<TSubclassOf<ACelestialBody>>& bodies )
+void ASolarSystem::SpawnBodies(AActor *parent, const TArray<TSubclassOf<ACelestialBody>>& bodies)
 {
-	check( parent );
+	check(parent);
 	// Add all the bodies in reverse order since AttachToActor works using a push-to-front mechanic
-	for( int i = bodies.Num() - 1; i >= 0; i-- )
+	for (int i = bodies.Num() - 1; i >= 0; i--)
 	{
-		ACelestialBody *actor = (ACelestialBody*)Super::GetWorld()->SpawnActor( bodies[i] );
-		if( actor == nullptr )
+		ACelestialBody *actor = (ACelestialBody*)Super::GetWorld()->SpawnActor(bodies[i]);
+		if (actor == nullptr)
 		{
 			continue;
 		}
-		actor->AttachToActor( parent, FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-		this->m_AttachedBodies.Add( actor );
+		actor->AttachToActor(parent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		this->m_AttachedBodies.Add(actor);
 
-		actor->SetSunLocation( Super::GetActorLocation() );
+		actor->SetSunLocation(Super::GetActorLocation());
 
 		const TArray<TSubclassOf<ACelestialBody>>& satellites = actor->GetSatellites();
-		if( satellites.Num() > 0 )
+		if (satellites.Num() > 0)
 		{
-			this->SpawnBodies( actor, satellites );
+			this->SpawnBodies(actor, satellites);
 		}
 	}
 }
 
 #if WITH_EDITOR
-void ASolarSystem::PostEditChangeProperty( FPropertyChangedEvent& PropertyChangedEvent )
+void ASolarSystem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	FName name = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
 
-	if( name == GET_MEMBER_NAME_CHECKED( ASolarSystem, m_RadiusScale ) || name == GET_MEMBER_NAME_CHECKED( ASolarSystem, m_OrbitDistanceScale ) )
+	if (name == GET_MEMBER_NAME_CHECKED(ASolarSystem, m_RadiusScale) || name == GET_MEMBER_NAME_CHECKED(ASolarSystem, m_OrbitDistanceScale))
 	{
 		this->bScaleUpdateRequired = true;
 	}
@@ -110,32 +95,32 @@ void ASolarSystem::PostEditChangeProperty( FPropertyChangedEvent& PropertyChange
 #endif
 
 // Called every frame
-void ASolarSystem::Tick( float delta )
+void ASolarSystem::Tick(float delta)
 {
-	Super::Tick( delta );
+	Super::Tick(delta);
 
-	for( AActor *actor : this->m_AttachedBodies )
+	for (AActor *actor : this->m_AttachedBodies)
 	{
-		if( !actor->IsA( ACelestialBody::StaticClass() ) )
+		if (!actor->IsA(ACelestialBody::StaticClass()))
 		{
 			continue;
 		}
-		ACelestialBody *body = Cast<ACelestialBody>( actor );
-		if( this->bScaleUpdateRequired )
+		ACelestialBody *body = Cast<ACelestialBody>(actor);
+		if (this->bScaleUpdateRequired)
 		{
-			body->SetScale( this->m_RadiusScale );
-			if( body == this->m_CenterActor )
+			body->SetScale(this->m_RadiusScale);
+			if (body == this->m_CenterActor)
 			{
 				this->m_CenterOffset = body->GetRadiusWithScale();
 			}
 		}
 		// Center actor does not move so there's no point calling the method
-		if( actor != this->m_CenterActor )
-		{
-			body->Move( this->m_CenterActor, this->m_TimeScale, this->m_OrbitDistanceScale, delta );
-		}
+		//if (actor != this->m_CenterActor)
+		//{
+			body->Move(this->m_CenterActor, this->m_TimeScale, this->m_OrbitDistanceScale, delta);
+		//}
 	}
-	if( this->bScaleUpdateRequired )
+	if (this->bScaleUpdateRequired)
 	{
 		this->bScaleUpdateRequired = false;
 	}

@@ -15,4 +15,10 @@ class INTERACTIVEVRGALAXY_API AStar : public ACelestialBody
 	
 public:
 	AStar();
+
+	// Stars only need to rotate so we will provide that functionality
+	virtual void Move(const ACelestialBody *center, const float& timeScale, const float& distanceScale, const float& delta) override;
+
+private:
+	float m_Timer;
 };
