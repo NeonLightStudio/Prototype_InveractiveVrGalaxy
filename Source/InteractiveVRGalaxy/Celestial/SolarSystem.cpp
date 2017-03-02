@@ -72,6 +72,7 @@ void ASolarSystem::SpawnBodies(AActor *parent, const TArray<TSubclassOf<ACelesti
 		actor->AttachToActor(parent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		this->m_AttachedBodies.Add(actor);
 
+		UE_LOG(LogClass, Log, TEXT("%f, %f, %f"), Super::GetActorLocation().X, Super::GetActorLocation().Y, Super::GetActorLocation().Z);
 		actor->SetSunLocation(Super::GetActorLocation());
 
 		const TArray<TSubclassOf<ACelestialBody>>& satellites = actor->GetSatellites();

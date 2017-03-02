@@ -14,7 +14,7 @@
 #define TIME_TO_SECONDS(days, hours, minutes, seconds) (((((days * 24.0f) + hours) * 60.0f) + minutes) * 60.0f + seconds)
 #define SECONDS_TO_DAYS(seconds) (seconds * 60.0f * 60.0f * 24.0f)
 
-#define MATERIAL_NAME_SUN_LOCATION FName("Sun Location")
+#define MATERIAL_NAME_SUN_LOCATION TEXT("Sun Location")
 
 UCLASS(abstract)
 class INTERACTIVEVRGALAXY_API ACelestialBody : public AActor
@@ -27,10 +27,6 @@ protected:
 
 public:
 	virtual void BeginPlay() override;
-
-#if WITH_EDITOR
-	void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
 
 	// Set the scale of the body
 	void SetScale(const float& size);
@@ -73,6 +69,10 @@ public:
 	FORCEINLINE const float& GetSolarSystemRadiusScale() const { return this->m_LastRadiusScale; }
 
 	FORCEINLINE const float& GetSolarSystemDistanceScale() const { return this->m_LastDistanceScale; }
+
+#if WITH_EDITOR
+	void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
 protected:
 	FORCEINLINE void CalculateSemiMinorAxis() { this->m_SemiMinorAxis = this->m_SemiMajorAxis * FMath::Sqrt(1.0f - this->m_Eccentricity * this->m_Eccentricity); }

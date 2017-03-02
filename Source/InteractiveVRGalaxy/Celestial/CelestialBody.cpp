@@ -80,80 +80,6 @@ void ACelestialBody::BeginPlay()
 	this->m_Root->SetRelativeRotation(FQuat(FVector(0.0f, 1.0f, 0.0f), -this->m_AxialTilt * DEG_TO_RAD));
 }
 
-#if WITH_EDITOR
-void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	FName name = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-
-	// If the Semi-major Axis or Eccentricity changes we will need to recalculate the Semi-minor axis
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_SemiMajorAxis)
-		|| name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_Eccentricity))
-	{
-		this->CalculateSemiMinorAxis();
-		this->CalculatePerimeter();
-		if (this->m_bDrawOrbit)
-		{
-			this->ResetDrawOrbit();
-		}
-	}
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_Material))
-	{
-		this->m_MaterialDynamic = UMaterialInstanceDynamic::Create(this->m_Material, this->m_Root);
-		// Update material parameters
-		this->SetSunLocation(this->m_SunLocation);
-	}
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_AxialTilt))
-	{
-		this->m_Root->SetRelativeRotation(FQuat(FVector(0.0f, 1.0f, 0.0f), -this->m_AxialTilt * DEG_TO_RAD));
-	}
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_bDrawOrbit))
-	{
-		this->m_bDrawOrbit = !this->m_bDrawOrbit;
-		this->SetDrawOrbit(!this->m_bDrawOrbit);
-	}
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_bDrawAtmosphere))
-	{
-		this->m_bDrawAtmosphere = !this->m_bDrawAtmosphere;
-		this->SetDrawAtmosphere(!this->m_bDrawAtmosphere);
-	}
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_RadiusScale))
-	{
-		this->SetRadiusScale(this->m_RadiusScale);
-	}
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_DrawOrbitRadius) && this->m_Orbit != nullptr)
-	{
-		this->m_Orbit->SetRadius(this->m_DrawOrbitRadius);
-		this->m_Orbit->UpdateOrbit();
-	}
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_DrawOrbitColor) && this->m_Orbit != nullptr)
-	{
-		this->m_Orbit->SetColor(this->m_DrawOrbitColor);
-		this->m_Orbit->UpdateOrbit();
-	}
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_DrawOrbitResolution) && this->m_Orbit != nullptr)
-	{
-		this->SetDrawOrbit(false);
-		this->SetDrawOrbit(true);
-	}
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_bMoveBody))
-	{
-		this->SetMoveBody(this->m_bMoveBody);
-	}
-
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_SunLocation))
-	{
-		this->SetSunLocation(this->m_SunLocation);
-	}
-
-	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_Mesh))
-	{
-		this->m_Root->SetStaticMesh(this->m_Mesh);
-	}
-
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-}
-#endif
-
 void ACelestialBody::SetSunLocation(const FVector& location)
 {
 	this->m_SunLocation = location;
@@ -372,3 +298,77 @@ void ACelestialBody::Move(const ACelestialBody *center, const float& timeScale, 
 		}
 	}
 }
+
+#if WITH_EDITOR
+void ACelestialBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	FName name = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+
+	// If the Semi-major Axis or Eccentricity changes we will need to recalculate the Semi-minor axis
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_SemiMajorAxis)
+		|| name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_Eccentricity))
+	{
+		this->CalculateSemiMinorAxis();
+		this->CalculatePerimeter();
+		if (this->m_bDrawOrbit)
+		{
+			this->ResetDrawOrbit();
+		}
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_Material))
+	{
+		this->m_MaterialDynamic = UMaterialInstanceDynamic::Create(this->m_Material, this->m_Root);
+		// Update material parameters
+		this->SetSunLocation(this->m_SunLocation);
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_AxialTilt))
+	{
+		this->m_Root->SetRelativeRotation(FQuat(FVector(0.0f, 1.0f, 0.0f), -this->m_AxialTilt * DEG_TO_RAD));
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_bDrawOrbit))
+	{
+		this->m_bDrawOrbit = !this->m_bDrawOrbit;
+		this->SetDrawOrbit(!this->m_bDrawOrbit);
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_bDrawAtmosphere))
+	{
+		this->m_bDrawAtmosphere = !this->m_bDrawAtmosphere;
+		this->SetDrawAtmosphere(!this->m_bDrawAtmosphere);
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_RadiusScale))
+	{
+		this->SetRadiusScale(this->m_RadiusScale);
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_DrawOrbitRadius) && this->m_Orbit != nullptr)
+	{
+		this->m_Orbit->SetRadius(this->m_DrawOrbitRadius);
+		this->m_Orbit->UpdateOrbit();
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_DrawOrbitColor) && this->m_Orbit != nullptr)
+	{
+		this->m_Orbit->SetColor(this->m_DrawOrbitColor);
+		this->m_Orbit->UpdateOrbit();
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_DrawOrbitResolution) && this->m_Orbit != nullptr)
+	{
+		this->SetDrawOrbit(false);
+		this->SetDrawOrbit(true);
+	}
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_bMoveBody))
+	{
+		this->SetMoveBody(this->m_bMoveBody);
+	}
+
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_SunLocation))
+	{
+		this->SetSunLocation(this->m_SunLocation);
+	}
+
+	if (name == GET_MEMBER_NAME_CHECKED(ACelestialBody, m_Mesh))
+	{
+		this->m_Root->SetStaticMesh(this->m_Mesh);
+	}
+
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+#endif
