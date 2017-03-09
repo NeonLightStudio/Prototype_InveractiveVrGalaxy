@@ -262,6 +262,7 @@ void ACelestialBody::Move(const ACelestialBody *center, const float& timeScale, 
 		this->m_LastDistanceScale = distanceScale;
 		if (resetOrbit)
 		{
+			UE_LOG(LogClass, Log, TEXT("1"));
 			// Recreate the orbit with the new offset and scale parameters in mind
 			this->ResetDrawOrbit();
 		}

@@ -31,5 +31,4 @@ protected:
 private:
 	UFUNCTION(BlueprintCallable, Category = "Dome")
 	void CreateDome();
-		
 };

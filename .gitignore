@@ -3,6 +3,8 @@ DerivedDataCache
 Intermediate
 Saved
 ipch
+WindowsNoEditor
+*_BuiltData.uasset
 *.VC.db
 *.opensdf
 *.opendb
