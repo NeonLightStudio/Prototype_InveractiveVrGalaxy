@@ -15,8 +15,10 @@ m_CenterOffset(0.0f), m_CenterActor(nullptr), bScaleUpdateRequired(false)
 
 void ASolarSystem::DespawnSystem()
 {
-	TArray<AActor*> actors;
-	for (AActor *next : this->m_AttachedBodies)
+	TArray<AActor*> systemActors, actors;
+
+	this->GetAttachedActors( systemActors );
+	for (AActor *next : systemActors )
 	{
 		if (next == nullptr)
 		{
