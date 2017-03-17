@@ -17,7 +17,7 @@ public:
 	AGalaxyGameMode();
 
 	UFUNCTION(BlueprintCallable, Category = "Orbit")
-	void SpawnOrbit(const FVector& location) const;
+	void SpawnOrbit(const FVector& location);
 
 	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void DespawnOrbit() const;

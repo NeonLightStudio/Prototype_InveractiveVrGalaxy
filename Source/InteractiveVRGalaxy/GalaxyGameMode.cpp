@@ -13,7 +13,7 @@ AGalaxyGameMode::AGalaxyGameMode()
 	Super::DefaultPawnClass = Pawn.Class;
 }
 
-void AGalaxyGameMode::SpawnOrbit(const FVector& location) const
+void AGalaxyGameMode::SpawnOrbit(const FVector& location)
 {
 	Super::GetWorld()->SpawnActor<ASolarSystem>(this->m_OrbitClass, location, FRotator(0.0f));
 }
