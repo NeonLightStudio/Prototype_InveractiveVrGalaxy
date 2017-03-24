@@ -18,12 +18,12 @@ void UOrbitMeshComponent::BeginPlay()
 void UOrbitMeshComponent::GenerateMesh()
 {
 	Super::ClearAllMeshSections();
-	if(this->m_Points.Num() < 3 || this->m_Radius <= 0.0f)
+	if (this->m_Points.Num() < 3 || this->m_Radius <= 0.0f)
 	{
 		// There's not enough sample points to make a circle or the radius is invalid
 		return;
 	}
-	for(int i = 1; i <= this->m_Points.Num(); i++)
+	for (int i = 1; i <= this->m_Points.Num(); i++)
 	{
 		int currIndex = i == this->m_Points.Num() ? 0 : i; //wrap around to start of loop if necessary
 		int prevIndex = i - 1; //should never be out-of-bounds if we start at index 1
@@ -31,7 +31,7 @@ void UOrbitMeshComponent::GenerateMesh()
 		TArray<FVector> vertices;
 		TArray<int32> indices;// { 0, 1, 2, 2, 3, 0 };
 
-		for(int j = 1; j <= CYLINDER_POINTS; j++)
+		for (int j = 1; j <= CYLINDER_POINTS; j++)
 		{
 			int currP = j == CYLINDER_POINTS ? 0 : j;
 			int prevP = j - 1;
@@ -42,7 +42,7 @@ void UOrbitMeshComponent::GenerateMesh()
 			vertices.Add({ this->m_Points[prevIndex] + FVector(FMath::Cos(delta) * this->m_Radius, 0.0f, FMath::Sin(delta) * this->m_Radius) });
 			vertices.Add({ this->m_Points[prevIndex] + FVector(FMath::Cos(theta) * this->m_Radius, 0.0f, FMath::Sin(theta) * this->m_Radius) });
 
-			for(auto idx : {0, 1, 2, 2, 3, 0})
+			for (auto idx : { 0, 1, 2, 2, 3, 0 })
 			{
 				indices.Add(idx + (j - 1) * 4);
 			}

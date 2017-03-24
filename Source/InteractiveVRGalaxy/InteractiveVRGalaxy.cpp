@@ -2,4 +2,4 @@
 
 #include "InteractiveVRGalaxy.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, InteractiveVRGalaxy, "InteractiveVRGalaxy" );
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, InteractiveVRGalaxy, "InteractiveVRGalaxy");

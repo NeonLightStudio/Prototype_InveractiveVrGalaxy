@@ -20,7 +20,7 @@ void AGalaxyGameMode::SpawnOrbit(const FVector& location)
 
 void AGalaxyGameMode::DespawnOrbit() const
 {
-	for(TActorIterator<ASolarSystem> itr(Super::GetWorld()); itr; ++itr)
+	for (TActorIterator<ASolarSystem> itr(Super::GetWorld()); itr; ++itr)
 	{
 		ASolarSystem *system = *itr;
 		if (system == nullptr)

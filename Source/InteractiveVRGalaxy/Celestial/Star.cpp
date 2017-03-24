@@ -37,7 +37,7 @@ void AStar::Move(const ACelestialBody* center, const float& timeScale, const flo
 {
 	this->m_Timer += delta * timeScale;
 
-	if(Super::m_RotationScale == 0.0f)
+	if (Super::m_RotationScale == 0.0f)
 	{
 		return;
 	}

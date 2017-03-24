@@ -177,12 +177,12 @@ void ACelestialBody::SetDrawOrbit(const bool& draw)
 		if (parent == nullptr)
 		{
 			// If we have no parent, we cannot create the orbit actor
-			this->m_bDrawOrbit = false;
+			//this->m_bDrawOrbit = false;
 			return;
 		}
 		// Create the orbit actor
-		this->m_Orbit = (AOrbit*)Super::GetWorld()->SpawnActor(AOrbit::StaticClass());
-		if (this->m_Orbit)
+		this->m_Orbit = Super::GetWorld()->SpawnActor<AOrbit>();
+		if (this->m_Orbit != nullptr)
 		{
 			// Set the points of the orbit accoding to the preset resolution
 			TArray<FVector> points;
@@ -242,7 +242,7 @@ void ACelestialBody::Move(const ACelestialBody *center, const float& timeScale, 
 	this->m_CurrentSpeed = velocity;
 
 	float kmPerDegree = this->m_Perimeter * distanceScale * this->m_OrbitDistanceScale / 360.0f;
-	if(kmPerDegree != 0.0f)
+	if (kmPerDegree != 0.0f)
 	{
 		// Check to see whether we want to offset from the center or the parent actor
 		float offset;
@@ -257,7 +257,7 @@ void ACelestialBody::Move(const ACelestialBody *center, const float& timeScale, 
 		// Check to see if the calling actor has changed the offset or distance scale
 		// If we have an orbit actor on this body then we will need to reset it to keep it accurate
 		bool resetOrbit = this->m_bDrawOrbit && (!FMath::IsNearlyEqual(this->m_LastOffset, offset)
-			|| !FMath::IsNearlyEqual(this->m_LastDistanceScale, distanceScale));
+			|| !FMath::IsNearlyEqual(this->m_LastDistanceScale, distanceScale) || this->m_Orbit == nullptr);
 		this->m_LastOffset = offset;
 		this->m_LastDistanceScale = distanceScale;
 		if (resetOrbit)

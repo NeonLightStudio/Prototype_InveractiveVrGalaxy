@@ -47,28 +47,28 @@ void UDomeMeshComponent::CreateDome()
 			temp.X = FMath::Cos(longitude + theta) * FMath::Sin(latitude + delta);
 			temp.Y = FMath::Cos(latitude + delta);
 			temp.Z = FMath::Sin(longitude + theta) * FMath::Sin(latitude + delta);
-			vertices.Add(temp); 
+			vertices.Add(temp);
 			uv.Add(FVector2D(0.0f, 1.0f));
 			//uv.Add(FVector2D(1.0f - (longitude + theta) / PI2 - 0.25f, (latitude + delta) / PI));
 
 			temp.X = FMath::Cos(longitude) * FMath::Sin(latitude + delta);
 			temp.Y = FMath::Cos(latitude + delta);
 			temp.Z = FMath::Sin(longitude) * FMath::Sin(latitude + delta);
-			vertices.Add(temp); 
+			vertices.Add(temp);
 			uv.Add(FVector2D(1.0f, 1.0f));
 			//uv.Add(FVector2D(1.0f - longitude / PI2 - 0.25f, (latitude + delta - PI / 180.0f) / PI));
 
 			temp.X = FMath::Cos(longitude) * FMath::Sin(latitude);
 			temp.Y = FMath::Cos(latitude);
 			temp.Z = FMath::Sin(longitude) * FMath::Sin(latitude);
-			vertices.Add(temp); 
+			vertices.Add(temp);
 			uv.Add(FVector2D(1.0f, 0.0f));
 			//uv.Add(FVector2D(1.0f - longitude / PI2 - 0.25f, latitude / PI));
 
 			temp.X = FMath::Cos(longitude + theta) * FMath::Sin(latitude);
 			temp.Y = FMath::Cos(latitude);
 			temp.Z = FMath::Sin(longitude + theta) * FMath::Sin(latitude);
-			vertices.Add(temp); 
+			vertices.Add(temp);
 			uv.Add(FVector2D(0.0f, 0.0f));
 			//uv.Add(FVector2D(1.0f - (longitude + theta) / PI2 - 0.25f, latitude / PI));
 
@@ -80,7 +80,7 @@ void UDomeMeshComponent::CreateDome()
 			}
 			normal /= vertices.Num();
 			normals.Init(normal, vertices.Num());
-			
+
 			// Create mesh section. Each section reprsents one panel. (one square)
 			Super::CreateMeshSection(count++, vertices, indices, normals, uv, TArray<FColor>(), TArray<FProcMeshTangent>(), DOME_COLLISION);
 		}

@@ -17,8 +17,8 @@ void ASolarSystem::DespawnSystem()
 {
 	TArray<AActor*> systemActors, actors;
 
-	this->GetAttachedActors( systemActors );
-	for (AActor *next : systemActors )
+	this->GetAttachedActors(systemActors);
+	for (AActor *next : systemActors)
 	{
 		if (next == nullptr)
 		{
@@ -66,7 +66,7 @@ void ASolarSystem::SpawnBodies(AActor *parent, const TArray<TSubclassOf<ACelesti
 	// Add all the bodies in reverse order since AttachToActor works using a push-to-front mechanic
 	for (int i = bodies.Num() - 1; i >= 0; i--)
 	{
-		ACelestialBody *actor = (ACelestialBody*)Super::GetWorld()->SpawnActor(bodies[i]);
+		ACelestialBody *actor = Super::GetWorld()->SpawnActor<ACelestialBody>(bodies[i]);
 		if (actor == nullptr)
 		{
 			continue;
@@ -103,11 +103,11 @@ void ASolarSystem::Tick(float delta)
 
 	for (AActor *actor : this->m_AttachedBodies)
 	{
-		if (!actor->IsA(ACelestialBody::StaticClass()))
+		ACelestialBody *body = Cast<ACelestialBody>(actor);
+		if(body == nullptr)
 		{
 			continue;
 		}
-		ACelestialBody *body = Cast<ACelestialBody>(actor);
 		if (this->bScaleUpdateRequired)
 		{
 			body->SetScale(this->m_RadiusScale);
@@ -116,11 +116,7 @@ void ASolarSystem::Tick(float delta)
 				this->m_CenterOffset = body->GetRadiusWithScale();
 			}
 		}
-		// Center actor does not move so there's no point calling the method
-		//if (actor != this->m_CenterActor)
-		//{
-			body->Move(this->m_CenterActor, this->m_TimeScale, this->m_OrbitDistanceScale, delta);
-		//}
+		body->Move(this->m_CenterActor, this->m_TimeScale, this->m_OrbitDistanceScale, delta);
 	}
 	if (this->bScaleUpdateRequired)
 	{

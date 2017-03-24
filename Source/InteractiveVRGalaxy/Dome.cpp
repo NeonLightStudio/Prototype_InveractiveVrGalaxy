@@ -109,7 +109,7 @@ void ADome::Tick(float delta)
 	if (this->m_NextDomeState != this->m_DomeState && this->m_NextDomeState != EDomeState::Undefined)
 	{
 		this->m_DomeTimer += delta;
-		if(this->m_DomeTimer >= ANIMATION_DURATION)
+		if (this->m_DomeTimer >= ANIMATION_DURATION)
 		{
 			this->m_DomeTimer = ANIMATION_DURATION;
 			this->m_DomeState = this->m_NextDomeState;

@@ -39,7 +39,7 @@ void AAtmosphere::BeginPlay()
 void AAtmosphere::UpdateAtmosphere() const
 {
 	check(this->m_Root);
-	if(this->m_Data == nullptr || this->m_Material == nullptr)
+	if (this->m_Data == nullptr || this->m_Material == nullptr)
 	{
 		return;
 	}
@@ -55,7 +55,7 @@ void AAtmosphere::UpdateAtmosphere() const
 		this->m_Material->SetVectorParameterValue(MATERIAL_NAME_ATMOSPHERE_COLOR, this->m_Data->m_Color);
 		this->m_Root->SetMaterial(0, this->m_Material);
 
-		this->m_Root->SetWorldScale3D(FVector((body->GetRadius() + this->m_Data->m_Height 
+		this->m_Root->SetWorldScale3D(FVector((body->GetRadius() + this->m_Data->m_Height
 			* this->m_Data->m_HeightScale) * body->GetSolarSystemRadiusScale() * body->GetRadiusScale()));
 	}
 }

@@ -10,13 +10,13 @@
 
 // Sets default values
 AOrbit::AOrbit() : m_Material(nullptr), m_Color(FLinearColor::White), m_Mesh(nullptr),
-	m_bMeshUpdateRequired(false), m_bMaterialUpdateRequired(false)
+m_bMeshUpdateRequired(false), m_bMaterialUpdateRequired(false)
 {
 	this->m_Mesh = UObject::CreateDefaultSubobject<UOrbitMeshComponent>(TEXT("OrbitMesh"));
 	Super::RootComponent = this->m_Mesh;
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> Material(TEXT(ORBIT_MATERIAL_LOCATION));
-	if(Material.Succeeded())
+	if (Material.Succeeded())
 	{
 		this->m_Material = Material.Object;
 	}
@@ -48,7 +48,7 @@ void AOrbit::SetPoints(TArray<FVector> points)
 
 void AOrbit::UpdateOrbit()
 {
-	if(this->m_bMeshUpdateRequired)
+	if (this->m_bMeshUpdateRequired)
 	{
 		this->m_Mesh->GenerateMesh();
 
