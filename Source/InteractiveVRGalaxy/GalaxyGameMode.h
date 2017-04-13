@@ -22,7 +22,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Orbit")
 	void DespawnOrbit() const;
 
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orbit", meta = (AllowPrivateAccess = "true", DisplayName = "Orbit Class"))
 	TSubclassOf<class ASolarSystem> m_OrbitClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orbit", meta = (AllowPrivateAccess = "true", DisplayName = "Spawn Orbit"))
+	bool m_bSpawnOrbit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orbit", meta = (AllowPrivateAccess = "true", DisplayName = "Despawn Orbit"))
+	bool m_bDespawnOrbit;
 };

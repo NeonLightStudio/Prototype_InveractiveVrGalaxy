@@ -4,13 +4,21 @@
 #include "SolarSystem.h"
 
 // Sets default values
-ASolarSystem::ASolarSystem() : m_TimeScale(1.0f), m_RadiusScale(1.0f), m_OrbitDistanceScale(1.0f),
-m_CenterOffset(0.0f), m_CenterActor(nullptr), bScaleUpdateRequired(false)
+ASolarSystem::ASolarSystem() : m_TimeScale(1.0f), m_RadiusScale(1.0f), m_OrbitDistanceScale(1.0f), m_bDespawn(false),
+m_AnimationScaleMultiplier(1.0f), m_AnimationCounter(0.0f), m_CenterOffset(0.0f), m_CenterActor(nullptr), bScaleUpdateRequired(false)
 {
+	this->m_SpawnAnimationDuration = 1.5f;
+
 	this->m_Root = UObject::CreateDefaultSubobject<USceneComponent>(TEXT("SolarSystemRoot"));
 	Super::RootComponent = this->m_Root;
 
 	Super::PrimaryActorTick.bCanEverTick = true;
+}
+
+void ASolarSystem::MarkForDespawn()
+{
+	this->m_bDespawn = true;
+	this->m_AnimationCounter = 0.0f;
 }
 
 void ASolarSystem::DespawnSystem()
@@ -36,6 +44,8 @@ void ASolarSystem::DespawnSystem()
 		next->Destroy();
 	}
 	this->m_AttachedBodies.Empty();
+
+	Super::Destroy();
 }
 
 // Called when the game starts or when spawned
@@ -101,6 +111,37 @@ void ASolarSystem::Tick(float delta)
 {
 	Super::Tick(delta);
 
+	if (this->m_bDespawn || this->m_AnimationCounter < this->m_SpawnAnimationDuration)
+	{
+		this->m_AnimationCounter += delta;
+
+		this->bScaleUpdateRequired = true;
+
+		if(this->m_bDespawn)
+		{
+			if(this->m_AnimationCounter >= this->m_SpawnAnimationDuration)
+			{
+				this->DespawnSystem();
+			}
+			else
+			{
+				this->m_AnimationScaleMultiplier = FMath::Cos((this->m_AnimationCounter
+					/ this->m_SpawnAnimationDuration) * 3.14159f / 2.0f);
+			}
+		}
+		else
+		{
+			if (this->m_AnimationCounter >= this->m_SpawnAnimationDuration)
+			{
+				this->m_AnimationScaleMultiplier = 1.0f;
+			}
+			else
+			{
+				this->m_AnimationScaleMultiplier = FMath::Sin((this->m_AnimationCounter
+					/ this->m_SpawnAnimationDuration) * 3.14159f / 2.0f);
+			}
+		}
+	}
 	for (AActor *actor : this->m_AttachedBodies)
 	{
 		ACelestialBody *body = Cast<ACelestialBody>(actor);
@@ -110,13 +151,13 @@ void ASolarSystem::Tick(float delta)
 		}
 		if (this->bScaleUpdateRequired)
 		{
-			body->SetScale(this->m_RadiusScale);
+			body->SetScale(this->m_RadiusScale * this->m_AnimationScaleMultiplier);
 			if (body == this->m_CenterActor)
 			{
 				this->m_CenterOffset = body->GetRadiusWithScale();
 			}
 		}
-		body->Move(this->m_CenterActor, this->m_TimeScale, this->m_OrbitDistanceScale, delta);
+		body->Move(this->m_CenterActor, this->m_TimeScale, this->m_OrbitDistanceScale * this->m_AnimationScaleMultiplier, delta);
 	}
 	if (this->bScaleUpdateRequired)
 	{

@@ -20,6 +20,9 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
+	void MarkForDespawn();
+
+	UFUNCTION()
 	void DespawnSystem();
 
 #if WITH_EDITOR
@@ -65,6 +68,19 @@ private:
 	// This scale multiplier will be applied to every body attached to this system. It can be used to bring bodies closer to the center. (1.0 = actual scale)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scale", meta = (AllowPrivateAccess = "true", DisplayName = "Distance Scale"))
 	float m_OrbitDistanceScale;
+
+	// How long the spawn animation should take
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn", meta = (AllowPrivateAccess = "true", DisplayName = "Spawn Animation Duration"))
+	float m_SpawnAnimationDuration;
+
+	// Whether or not we are despawning
+	float m_bDespawn;
+
+	// Animation multiplier. 0.0 = start, 1.0 = end
+	float m_AnimationScaleMultiplier;
+
+	// Time since spawn. Used for spawn animation
+	float m_AnimationCounter;
 
 	// The radius of the center actor. It is required to work out distances of attached bodies
 	float m_CenterOffset;
