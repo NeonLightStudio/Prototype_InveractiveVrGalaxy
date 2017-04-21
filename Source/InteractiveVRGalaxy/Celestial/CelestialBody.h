@@ -198,6 +198,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scale", meta = (AllowPrivateAccess = "true", DisplayName = "Orbit Distance Scale (%)"))
 	float m_OrbitDistanceScale;
 
+	// Rings size multiplier (1.0 = default distance according to solar system object)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scale", meta = (AllowPrivateAccess = "true", DisplayName = "Rings Scale (%)"))
+	float m_RingScale;
+
 	// Gravity on the surface of the body (m/s)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Characteristics", meta = (AllowPrivateAccess = "true", DisplayName = "Gravity (m/s)"))
 	float m_Gravity;

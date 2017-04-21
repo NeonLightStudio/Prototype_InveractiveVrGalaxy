@@ -30,6 +30,7 @@ ACelestialBody::ACelestialBody() : m_Mesh(nullptr), m_Material(nullptr), m_Mater
 	this->m_RotationScale = 1.0f;
 	this->m_RadiusScale = 1.0f;
 	this->m_OrbitDistanceScale = 1.0f;
+	this->m_RingScale = 1.0f;
 
 	// Movement
 	this->m_bMoveBody = true;
@@ -65,6 +66,7 @@ void ACelestialBody::BeginPlay()
 		this->SetScale(1.0f);
 	}
 	this->m_MaterialDynamic = UMaterialInstanceDynamic::Create(this->m_Material, this->m_Root);
+	this->m_Angle = FMath::FRandRange(0.0f, 360.0f);
 
 	this->SetSunLocation(this->m_SunLocation);
 	if (this->m_bDrawOrbit)

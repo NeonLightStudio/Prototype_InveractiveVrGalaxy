@@ -41,7 +41,7 @@ void AGalaxyGameMode::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 	if (name == GET_MEMBER_NAME_CHECKED(AGalaxyGameMode, m_bSpawnOrbit))
 	{
 		this->DespawnOrbit();
-		this->SpawnOrbit(FVector(-765.0f, -385.0f, 265.0f));
+		this->SpawnOrbit(FVector(5.0f, -5.0f, 395.0f));
 		this->m_bSpawnOrbit = false;
 	}
 	if (name == GET_MEMBER_NAME_CHECKED(AGalaxyGameMode, m_bDespawnOrbit))
