@@ -18,18 +18,11 @@ void AGalaxyGameMode::SpawnOrbit(const FVector& location)
 	Super::GetWorld()->SpawnActor<ASolarSystem>(this->m_OrbitClass, location, FRotator(0.0f));
 }
 
-void AGalaxyGameMode::DespawnOrbit() const
+void AGalaxyGameMode::DespawnOrbit()
 {
 	for (TActorIterator<ASolarSystem> itr(Super::GetWorld()); itr; ++itr)
 	{
-		ASolarSystem *system = *itr;
-		if (system == nullptr)
-		{
-			continue;
-		}
-		system->MarkForDespawn();
-		//system->DespawnSystem();
-		//system->Destroy();
+		itr->MarkForDespawn();
 	}
 }
 

@@ -20,7 +20,7 @@ public:
 	void SpawnOrbit(const FVector& location);
 
 	UFUNCTION(BlueprintCallable, Category = "Orbit")
-	void DespawnOrbit() const;
+	void DespawnOrbit();
 
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

@@ -53,6 +53,9 @@ ACelestialBody::ACelestialBody() : m_Mesh(nullptr), m_Material(nullptr), m_Mater
 	{
 		this->m_Root->SetStaticMesh(this->m_Mesh = sphere.Object);
 	}
+
+	this->m_Root->SetCollisionProfileName(TEXT("NoCollision"));
+	this->m_Root->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ACelestialBody::BeginPlay()
